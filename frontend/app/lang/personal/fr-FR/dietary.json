@@ -1,0 +1,20 @@
+{
+  "title": "Vérifications",
+  "subtitle": "Indiquez pour chaque aliment s'il respecte une restriction. Seule une vérification faite par vous rend un aliment « vérifié » : ni son nom, ni une étiquette en ligne, ni l'assistant n'y suffisent.",
+  "pick-food": "Choisir un aliment",
+  "mark-verified": "Vérifié",
+  "mark-incompatible": "Incompatible",
+  "reset": "Remettre à zéro",
+  "reason": "Remarque (marque, date de lecture de l'étiquette…)",
+  "restrictions-title": "Restrictions",
+  "new-restriction": "Nouvelle restriction",
+  "restriction-key": "Clé",
+  "restriction-name": "Nom",
+  "restriction-kind": "Type",
+  "standard": "standard",
+  "tools-title": "Ustensiles à vérifier",
+  "tools-help": "Un ustensile signalé apparaît dans la liste de contrôle quand une restriction couvre toute la préparation.",
+  "tool": "Ustensile",
+  "flag-tool": "Signaler un ustensile",
+  "no-tools": "Aucun ustensile signalé."
+}

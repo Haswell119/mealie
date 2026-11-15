@@ -1,0 +1,20 @@
+{
+  "title": "Verifications",
+  "subtitle": "State for each food whether it follows a restriction. Only a verification that you make marks a food as verified: its name, an online label or the assistant are not enough.",
+  "pick-food": "Pick a food",
+  "mark-verified": "Verified",
+  "mark-incompatible": "Incompatible",
+  "reset": "Reset",
+  "reason": "Note (brand, date you read the label…)",
+  "restrictions-title": "Restrictions",
+  "new-restriction": "New restriction",
+  "restriction-key": "Key",
+  "restriction-name": "Name",
+  "restriction-kind": "Type",
+  "standard": "standard",
+  "tools-title": "Tools to check",
+  "tools-help": "A flagged tool shows in the checklist when a restriction covers the whole preparation.",
+  "tool": "Tool",
+  "flag-tool": "Flag a tool",
+  "no-tools": "No flagged tool."
+}

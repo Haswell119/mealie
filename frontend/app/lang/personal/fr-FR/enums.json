@@ -1,0 +1,77 @@
+{
+  "status": {
+    "VERIFIED": "Vérifié",
+    "UNVERIFIED": "À vérifier",
+    "INCOMPATIBLE": "Incompatible"
+  },
+  "scope": {
+    "INDIVIDUAL": "La personne seulement",
+    "ENTIRE_MEAL": "Tout le repas",
+    "ENTIRE_PREPARATION": "Toute la préparation"
+  },
+  "scope-help": {
+    "INDIVIDUAL": "Seule la portion de cette personne respecte la restriction.",
+    "ENTIRE_MEAL": "Toutes les recettes et toutes les portions respectent la restriction.",
+    "ENTIRE_PREPARATION": "Tout respecte la restriction : ingrédients, ustensiles, surfaces et contamination croisée."
+  },
+  "severity": {
+    "STRICT": "Stricte",
+    "MODERATE": "Modérée",
+    "PREFERENCE": "Préférence"
+  },
+  "kind": {
+    "MEDICAL": "Médicale",
+    "ALLERGY": "Allergie",
+    "INTOLERANCE": "Intolérance",
+    "ETHICAL": "Conviction",
+    "PREFERENCE": "Préférence"
+  },
+  "appetite": {
+    "SMALL": "Petit appétit",
+    "NORMAL": "Appétit normal",
+    "LARGE": "Gros appétit"
+  },
+  "course": {
+    "APERITIF": "Apéritif",
+    "STARTER": "Entrée",
+    "MAIN": "Plat principal",
+    "SIDE": "Accompagnement",
+    "DESSERT": "Dessert",
+    "OTHER": "Autre"
+  },
+  "origin": {
+    "PERSON_DEFAULT": "profil de la personne",
+    "COOK_PROFILE": "profil du cuisinier",
+    "EVENT_OVERRIDE": "dérogation pour l'événement",
+    "PREPARATION_OVERRIDE": "dérogation pour ce plat"
+  },
+  "source": {
+    "MANUAL": "Vérifié par vous",
+    "RULE": "Règle par mots-clés",
+    "AI_SUGGESTION": "Suggestion de l'assistant",
+    "PRODUCT_LABEL": "Étiquette du produit"
+  },
+  "finding": {
+    "RULE_MATCH": "Contient « {term} »",
+    "LABEL_CHECK": "« {term} » : lire l'étiquette",
+    "FREE_CLAIM": "Annoncé « {term} » : à confirmer sur l'emballage",
+    "NO_DATA": "Aucune vérification enregistrée",
+    "FREE_TEXT": "Ingrédient en texte libre, non relié à un aliment",
+    "STORED": "{detail}",
+    "STORED_EMPTY": "Marqué manuellement",
+    "TOOL_CHECK": "Ustensile à vérifier (contamination croisée)",
+    "NO_INGREDIENTS": "La recette n'a aucun ingrédient",
+    "NO_VARIANT": "Aucun plat compatible pour {person}",
+    "MANUAL_ASSIGNMENT": "Plat attribué à la main à {person} malgré sa restriction",
+    "MISSING_SERVINGS": "La recette n'indique pas son nombre de portions",
+    "RECIPE_NOT_FOUND": "Recette introuvable"
+  },
+  "checklist": {
+    "CHECK_LABELS": "Lire l'étiquette de chaque produit transformé",
+    "CLEAN_SURFACES": "Nettoyer le plan de travail avant de commencer",
+    "DEDICATED_UTENSILS": "Utiliser des ustensiles, planches et éponges propres ou dédiés",
+    "SEPARATE_COOKING": "Ne pas partager l'eau de cuisson, l'huile de friture ni le grille-pain",
+    "SERVE_SEPARATELY": "Servir avec des couverts dédiés, sans contact avec d'autres plats",
+    "TOOL_CHECK": "Vérifier l'ustensile : {subject}"
+  }
+}

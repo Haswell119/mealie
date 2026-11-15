@@ -1,0 +1,77 @@
+{
+  "status": {
+    "VERIFIED": "Verified",
+    "UNVERIFIED": "To verify",
+    "INCOMPATIBLE": "Incompatible"
+  },
+  "scope": {
+    "INDIVIDUAL": "This person only",
+    "ENTIRE_MEAL": "The whole meal",
+    "ENTIRE_PREPARATION": "The whole preparation"
+  },
+  "scope-help": {
+    "INDIVIDUAL": "Only the portion of this person follows the restriction.",
+    "ENTIRE_MEAL": "Every recipe and every portion follows the restriction.",
+    "ENTIRE_PREPARATION": "Everything follows the restriction: ingredients, tools, surfaces and cross-contamination."
+  },
+  "severity": {
+    "STRICT": "Strict",
+    "MODERATE": "Moderate",
+    "PREFERENCE": "Preference"
+  },
+  "kind": {
+    "MEDICAL": "Medical",
+    "ALLERGY": "Allergy",
+    "INTOLERANCE": "Intolerance",
+    "ETHICAL": "Conviction",
+    "PREFERENCE": "Preference"
+  },
+  "appetite": {
+    "SMALL": "Small appetite",
+    "NORMAL": "Normal appetite",
+    "LARGE": "Large appetite"
+  },
+  "course": {
+    "APERITIF": "Aperitif",
+    "STARTER": "Starter",
+    "MAIN": "Main course",
+    "SIDE": "Side dish",
+    "DESSERT": "Dessert",
+    "OTHER": "Other"
+  },
+  "origin": {
+    "PERSON_DEFAULT": "profile of the person",
+    "COOK_PROFILE": "profile of the cook",
+    "EVENT_OVERRIDE": "exception for the event",
+    "PREPARATION_OVERRIDE": "exception for this dish"
+  },
+  "source": {
+    "MANUAL": "Verified by you",
+    "RULE": "Keyword rule",
+    "AI_SUGGESTION": "Suggested by the assistant",
+    "PRODUCT_LABEL": "Product label"
+  },
+  "finding": {
+    "RULE_MATCH": "Contains \"{term}\"",
+    "LABEL_CHECK": "\"{term}\": read the label",
+    "FREE_CLAIM": "Sold as \"{term}\": confirm on the pack",
+    "NO_DATA": "No verification on record",
+    "FREE_TEXT": "Free-text ingredient, not linked to a food",
+    "STORED": "{detail}",
+    "STORED_EMPTY": "Marked by hand",
+    "TOOL_CHECK": "Tool to check (cross-contamination)",
+    "NO_INGREDIENTS": "The recipe has no ingredients",
+    "NO_VARIANT": "No compatible dish for {person}",
+    "MANUAL_ASSIGNMENT": "Dish given by hand to {person} against a restriction",
+    "MISSING_SERVINGS": "The recipe does not state its servings",
+    "RECIPE_NOT_FOUND": "Recipe not found"
+  },
+  "checklist": {
+    "CHECK_LABELS": "Read the label of every processed product",
+    "CLEAN_SURFACES": "Clean the worktop before you start",
+    "DEDICATED_UTENSILS": "Use clean or dedicated tools, boards and sponges",
+    "SEPARATE_COOKING": "Do not share cooking water, frying oil or the toaster",
+    "SERVE_SEPARATELY": "Serve with dedicated cutlery, away from other dishes",
+    "TOOL_CHECK": "Check the tool: {subject}"
+  }
+}

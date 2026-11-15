@@ -100,9 +100,12 @@ import { useGroupSelf } from "~/composables/use-groups";
 import { useCookbookPreferences } from "~/composables/use-users/preferences";
 import { useCookbookStore, usePublicCookbookStore } from "~/composables/store/use-cookbook-store";
 import type { CookBookOut } from "~/lib/api/types/cookbook";
+import { usePersonalCreateLinks, usePersonalSidebarLinks } from "~/composables/personal/use-personal-nav";
 
 const i18n = useI18n();
 const { $globals } = useNuxtApp();
+const personalSidebarLinks = usePersonalSidebarLinks();
+const personalCreateLinks = usePersonalCreateLinks();
 const display = useDisplay();
 const auth = useMealieAuth();
 const { isOwnGroup } = useLoggedInState();
@@ -221,6 +224,7 @@ const createLinks = computed(() => [
     restricted: true,
     hide: false,
   },
+  ...personalCreateLinks.value,
 ]);
 
 const topLinks = computed<SideBarLink[]>(() => [
@@ -248,6 +252,7 @@ const topLinks = computed<SideBarLink[]>(() => [
     to: "/shopping-lists",
     restricted: true,
   },
+  ...personalSidebarLinks.value,
   {
     icon: $globals.icons.timelineText,
     title: i18n.t("recipe.timeline"),
