@@ -120,8 +120,8 @@
         <div class="font-weight-medium">
           {{ issueTitle(issue) }}
         </div>
-        <div v-if="issue.recipeName || issue.detail">
-          {{ [issue.recipeName, issue.detail].filter(Boolean).join(' · ') }}
+        <div v-if="issueSubject(issue)">
+          {{ issueSubject(issue) }}
         </div>
       </v-alert>
 
@@ -245,7 +245,7 @@
               :disabled="busy"
               :prepend-icon="mdiRefresh"
               data-testid="plan-recompute"
-              @click="load"
+              @click="recompute"
             >
               {{ $t('personal.shopping.recompute') }}
             </v-btn>
@@ -406,6 +406,11 @@ function issueTitle(issue: ShoppingPlanIssue): string {
   return i18n.te(key) ? i18n.t(key) : i18n.t("personal.shopping.issue.unknown", { code: issue.code });
 }
 
+/** The recipe and the detail of a problem, once each: the server often sends the same text in both. */
+function issueSubject(issue: ShoppingPlanIssue): string {
+  return [...new Set([issue.recipeName, issue.detail].filter(Boolean))].join(" · ");
+}
+
 /** Compute the plan again. The preview never writes anything. */
 async function load() {
   loading.value = true;
@@ -426,6 +431,13 @@ async function load() {
   if (!hasDismissed.value) {
     restoreDismissed.value = false;
   }
+}
+
+/** A recomputation asked by the user: the messages of the previous actions no longer describe what is shown. */
+async function recompute() {
+  applyResult.value = null;
+  receiveResult.value = null;
+  await load();
 }
 
 async function loadEventName() {
