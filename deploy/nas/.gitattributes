@@ -1,0 +1,3 @@
+# Ces fichiers s'exécutent sur le NAS (Linux) : fins de ligne LF, même si le dépôt est cloné sous
+# Windows avec core.autocrlf=true. Un script en CRLF échoue dès sa ligne `set -eu`.
+* text=auto eol=lf

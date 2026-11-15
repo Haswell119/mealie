@@ -1,0 +1,2 @@
+# Réglages propres au poste qui déploie (adresse SSH du NAS) : voir deploy-from-pc.sh.
+.deploy.env

@@ -20,7 +20,12 @@ echo "1/4 Sauvegarde avant mise à jour…"
 docker compose run --rm backup now
 
 echo "2/4 Téléchargement de la nouvelle image…"
-MEALIE_IMAGE="$new_image" docker compose pull mealie
+# Une image chargée par `docker load` (deploy-from-pc.sh) n'existe dans aucun registre.
+if docker image inspect "$new_image" > /dev/null 2>&1; then
+    echo "    Image déjà présente sur le NAS."
+else
+    MEALIE_IMAGE="$new_image" docker compose pull mealie
+fi
 
 echo "3/4 Redémarrage…"
 cp .env ".env.before-upgrade"

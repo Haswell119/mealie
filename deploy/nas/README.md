@@ -9,6 +9,26 @@ propres volumes. Elle ne modifie aucune autre application du NAS.
 | `postgres` | la base de données | aucun |
 | `backup` | sauvegarde chiffrée quotidienne | aucun |
 
+## En bref : déployer depuis son poste
+
+Dans le dépôt, sur le poste de développement (Git Bash sous Windows) :
+
+```bash
+NAS_SSH=utilisateur@nas sh deploy/nas/deploy-from-pc.sh
+```
+
+Le script construit l'image à partir du dernier commit, l'envoie au NAS par SSH sans passer par un
+registre, copie ce dossier dans `/volume2/docker/mealie-pe` et y lance `install.sh`.
+
+- **Premier passage** : `install.sh` crée les deux secrets et un fichier `.env`, puis s'arrête.
+  Compléter `.env` sur le NAS (étapes 1 et 2), puis relancer la même commande : la pile démarre.
+- **Passages suivants** : la même commande met à jour, avec une sauvegarde vérifiée avant.
+
+Pour ne pas retaper l'adresse, l'écrire dans `deploy/nas/.deploy.env` (non suivi par git) :
+`NAS_SSH=utilisateur@nas`. Les autres réglages sont décrits en tête du script.
+
+Les étapes ci-dessous détaillent ce que fait le script et permettent de tout faire à la main.
+
 ## 1. Auditer le NAS (lecture seule)
 
 Copier le dossier `deploy/nas` sur le NAS, puis :
@@ -55,7 +75,10 @@ passe). Sans elle, les sauvegardes sont illisibles.
 
 ## 3. Obtenir l'image
 
-L'image se construit par GitHub Actions (onglet *Actions* du dépôt → *Personal Edition Image* →
+**Sans registre** : `deploy-from-pc.sh` construit l'image sur le poste et la charge sur le NAS sous
+le nom `mealie-pe:<version>-pe.<commit>`. Rien d'autre à faire.
+
+**Avec un registre** : l'image se construit par GitHub Actions (onglet *Actions* du dépôt → *Personal Edition Image* →
 *Run workflow*, étiquette `3.31.0-pe.1`). Le workflow lance d'abord tous les tests et ne publie
 l'image que s'ils passent. L'image arrive dans `ghcr.io/<votre compte>/mealie-pe`.
 
@@ -98,6 +121,10 @@ tailscale serve --bg --https=443 http://127.0.0.1:9925
 Vérifier d'abord avec `tailscale serve status` (affiché par l'audit) qu'aucun service n'occupe déjà
 le port 443 de Tailscale ; sinon choisir un autre port HTTPS, par exemple `--https=8443`.
 `BASE_URL` vaut alors `https://<nom-du-nas>.<votre-tailnet>.ts.net` (avec `:8443` le cas échéant).
+
+**Tailscale dans un conteneur** (le NAS n'a pas la commande `tailscale`) : brancher un conteneur
+Tailscale sur le réseau `mealie-pe_internal` et lui faire relayer `http://mealie:9000`. Le port de
+l'hôte ne sert alors pas. `BASE_URL` vaut `https://<nom du conteneur Tailscale>.<votre-tailnet>.ts.net`.
 
 **Reverse proxy déjà présent sur le NAS** : y ajouter un hôte qui pointe vers
 `http://127.0.0.1:<MEALIE_PORT>`. Ne pas modifier les hôtes existants. Le proxy doit transmettre les
@@ -154,6 +181,8 @@ n'est pas une sauvegarde.
 ```bash
 sh ./upgrade.sh ghcr.io/<votre compte>/mealie-pe:3.32.0-pe.1
 ```
+
+Depuis le poste, `deploy-from-pc.sh` construit la nouvelle image puis appelle ce même script.
 
 Le script fait une sauvegarde vérifiée, change l'image, redémarre et contrôle l'état de santé. Les
 migrations de Mealie et du fork s'appliquent au démarrage.
