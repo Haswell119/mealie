@@ -57,11 +57,22 @@ class ProductService:
         query = query.strip()
         if len(query) < 2:
             raise PersonalError("QUERY_TOO_SHORT", "Type at least two characters.")
-        try:
-            products = self.client.search(query, store)
-        except ProductCatalogUnavailable:
+        # Without a shop, search each of the four shops: an open search also returns products of other chains.
+        stores = [store] if store is not None else list(RetailStore)
+        products: dict[str, ProductBase] = {}
+        answered = False
+        for wanted in stores:
+            try:
+                found = self.client.search(query, wanted)
+            except ProductCatalogUnavailable:
+                continue
+            answered = True
+            for product in found:
+                products.setdefault(product.barcode, product)
+
+        if not answered:
             return ProductSearchOut(query=query, store=store, available=False)
-        return ProductSearchOut(query=query, store=store, products=products)
+        return ProductSearchOut(query=query, store=store, products=list(products.values()))
 
     def get_one(self, product_id: UUID4) -> ProductOut:
         product = self.products.get_one(product_id)
@@ -130,16 +141,16 @@ class ProductService:
         label = f"{product.name} ({product.barcode})"
         for allergen in product.allergens:
             for key in ALLERGEN_KEYS.get(allergen, []):
-                suggest(key, VerificationStatus.INCOMPATIBLE, f"Allergen declared on {label}", f"CONTAINS:{key}")
+                suggest(key, VerificationStatus.INCOMPATIBLE, f"Allergène déclaré sur {label}", f"CONTAINS:{key}")
         for trace in product.traces:
             for key in ALLERGEN_KEYS.get(trace, []):
-                suggest(key, VerificationStatus.UNVERIFIED, f"Traces declared on {label}", f"TRACES:{key}")
+                suggest(key, VerificationStatus.UNVERIFIED, f"Traces déclarées sur {label}", f"TRACES:{key}")
         for product_label in product.labels:
             for key in FREE_LABEL_KEYS.get(product_label, []):
                 suggest(
                     key,
                     VerificationStatus.UNVERIFIED,
-                    f"Label '{product_label}' declared on {label}. Check the pack.",
+                    f"Étiquette « {product_label} » déclarée sur {label}. À vérifier sur l'emballage.",
                     f"LABEL_CLAIM:{key}",
                 )
         return hints

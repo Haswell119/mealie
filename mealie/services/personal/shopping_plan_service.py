@@ -188,7 +188,8 @@ class ShoppingPlanService:
                             code=finding.code,
                             recipe_id=finding.recipe_id,
                             recipe_name=finding.recipe_name,
-                            detail=finding.person_name or finding.subject,
+                            detail=finding.person_name
+                            or (finding.subject if finding.subject != finding.recipe_name else None),
                         )
                     )
             return needs, issues, restriction_keys

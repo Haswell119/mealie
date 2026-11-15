@@ -31,7 +31,7 @@
           :label="$t('personal.people.is-me')"
           data-testid="person-is-me"
         />
-        <div class="text-caption text-medium-emphasis mb-3">
+        <div class="text-body-small text-medium-emphasis mb-3">
           {{ $t('personal.people.is-me-help') }}
         </div>
 
@@ -43,7 +43,7 @@
             :label="$t('personal.people.consent')"
             data-testid="person-consent"
           />
-          <div class="text-caption text-medium-emphasis mb-3">
+          <div class="text-body-small text-medium-emphasis mb-3">
             {{ $t('personal.people.consent-help') }}
           </div>
           <v-text-field
@@ -56,7 +56,7 @@
 
         <template v-if="canHoldData">
           <v-divider class="my-3" />
-          <h3 class="text-subtitle-1 mb-2">
+          <h3 class="text-title-medium mb-2">
             {{ $t('personal.people.restrictions') }}
           </h3>
           <v-card
@@ -115,7 +115,7 @@
                 />
               </v-col>
             </v-row>
-            <p class="text-caption text-medium-emphasis mt-2 mb-0">
+            <p class="text-body-small text-medium-emphasis mt-2 mb-0">
               {{ $t(`personal.enums.scope-help.${restriction.defaultScope}`) }}
             </p>
             <v-checkbox
@@ -275,7 +275,7 @@
         >{{ $t('personal.people.no-restriction') }}</span>
         <div
           v-if="person.foodPreferences.length"
-          class="text-caption mt-2"
+          class="text-body-small mt-2"
         >
           <span v-if="preferenceNames(person, 'LIKE')">
             {{ $t('personal.people.likes') }} : {{ preferenceNames(person, 'LIKE') }}
@@ -286,7 +286,7 @@
         </div>
         <div
           v-if="!person.linkedUserId"
-          class="text-caption text-medium-emphasis mt-2"
+          class="text-body-small text-medium-emphasis mt-2"
         >
           {{ person.consentGivenAt
             ? $t('personal.people.consent-given', { date: $d(new Date(person.consentGivenAt), 'short') })

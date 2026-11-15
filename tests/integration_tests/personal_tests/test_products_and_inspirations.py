@@ -89,6 +89,16 @@ def test_product_search_is_limited_to_switzerland_and_a_shop(api_client: TestCli
     assert bad.status_code == 422
 
 
+def test_search_without_a_shop_asks_each_of_the_four_shops(api_client: TestClient, unique_user: TestUser, catalog):
+    calls, _ = catalog
+    response = api_client.get(f"{PRODUCTS}/search", params={"query": "pain burger"}, headers=unique_user.token)
+    assert response.status_code == 200, response.text
+
+    assert sorted(params["tag_1"] for _, params in calls) == ["aldi", "coop", "lidl", "migros"]
+    # the same product found in several shops is listed once
+    assert [product["barcode"] for product in response.json()["products"]] == [GF_BUN["code"]]
+
+
 def test_product_search_reports_an_unavailable_database(api_client: TestClient, unique_user: TestUser, catalog):
     _, state = catalog
     state["fail"] = True

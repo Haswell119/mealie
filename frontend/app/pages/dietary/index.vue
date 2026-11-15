@@ -98,10 +98,10 @@
       </v-card-text>
     </BaseDialog>
 
-    <h3 class="text-h6 mt-6 mb-2">
+    <h3 class="text-title-large mt-6 mb-2">
       {{ $t('personal.dietary.check-recipe-title') }}
     </h3>
-    <p class="text-body-2 text-medium-emphasis">
+    <p class="text-body-medium text-medium-emphasis">
       {{ $t('personal.dietary.check-recipe-help') }}
     </p>
     <v-autocomplete
@@ -169,7 +169,7 @@
       </v-card-text>
     </v-card>
 
-    <h3 class="text-h6 mt-6 mb-2">
+    <h3 class="text-title-large mt-6 mb-2">
       {{ $t('personal.dietary.restrictions-title') }}
     </h3>
     <div class="d-flex flex-wrap ga-2 mb-3">
@@ -229,10 +229,10 @@
       </v-col>
     </v-row>
 
-    <h3 class="text-h6 mt-6 mb-2">
+    <h3 class="text-title-large mt-6 mb-2">
       {{ $t('personal.dietary.tools-title') }}
     </h3>
-    <p class="text-body-2 text-medium-emphasis">
+    <p class="text-body-medium text-medium-emphasis">
       {{ $t('personal.dietary.tools-help') }}
     </p>
     <v-row
