@@ -350,6 +350,12 @@ const explore = computed(() => [
     hint: i18n.t("personal.hub.explore-planner-hint"),
   },
   {
+    to: "/ideas",
+    icon: personalIcons.ideas,
+    title: i18n.t("personal.nav.ideas"),
+    hint: i18n.t("personal.hub.explore-ideas-hint"),
+  },
+  {
     to: "/inspirations",
     icon: personalIcons.inspirations,
     title: i18n.t("personal.nav.inspirations"),

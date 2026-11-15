@@ -11,12 +11,14 @@ from .meal_event import (
 )
 from .pantry import PeFoodPackaging, PePantryItem, PeProduct
 from .person import PePerson, PePersonFoodPreference, PePersonRestriction
+from .price import PeFoodPrice
 from .shopping_plan import PeShoppingPlan, PeShoppingPlanLine
 
 __all__ = [
     "PeAiProposal",
     "PeDietaryRestriction",
     "PeFoodPackaging",
+    "PeFoodPrice",
     "PeFoodRestrictionStatus",
     "PeInspiration",
     "PeMealEvent",

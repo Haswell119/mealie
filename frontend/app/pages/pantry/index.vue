@@ -35,6 +35,9 @@
       <v-tabs-window-item value="packagings">
         <PantryPackagings ref="packagings" />
       </v-tabs-window-item>
+      <v-tabs-window-item value="prices">
+        <PantryPrices />
+      </v-tabs-window-item>
       <v-tabs-window-item value="products">
         <PantryProducts @imported="packagings?.refresh()" />
       </v-tabs-window-item>
@@ -45,6 +48,7 @@
 <script setup lang="ts">
 import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import PantryPackagings from "~/components/Domain/Pantry/PantryPackagings.vue";
+import PantryPrices from "~/components/Domain/Pantry/PantryPrices.vue";
 import PantryProducts from "~/components/Domain/Pantry/PantryProducts.vue";
 import PantryStock from "~/components/Domain/Pantry/PantryStock.vue";
 import { personalIcons } from "~/composables/personal/use-personal-nav";
@@ -53,7 +57,7 @@ definePageMeta({
   middleware: ["auth"],
 });
 
-const tabs = ["stock", "packagings", "products"] as const;
+const tabs = ["stock", "packagings", "prices", "products"] as const;
 type PantryTab = (typeof tabs)[number];
 
 const i18n = useI18n();

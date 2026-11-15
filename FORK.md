@@ -23,11 +23,12 @@ Ce fichier explique comment le fork est construit pour rester facile à mettre �
 | Routes | `mealie/routes/personal/` |
 | Tests | `tests/unit_tests/personal_tests/`, `tests/integration_tests/personal_tests/` |
 | Client API | `frontend/app/lib/api/user/personal.ts` |
-| Pages | `frontend/app/pages/{hub,people,dietary,events,shopping-plans,pantry,inspirations,assistant}/` |
+| Pages | `frontend/app/pages/{hub,ideas,people,dietary,events,shopping-plans,pantry,inspirations,assistant}/` |
 | Apparence « verre liquide » | `frontend/app/assets/personal/liquid-glass.css`, chargée par `frontend/app/plugins/personal-theme.client.ts` |
-| Composants et composables | `frontend/app/components/Domain/{Personal,MealEvent,ShoppingPlan,Pantry,Inspiration,Assistant}/`, `frontend/app/composables/personal/` |
+| Composants et composables | `frontend/app/components/Domain/{Personal,Idea,MealEvent,ShoppingPlan,Pantry,Inspiration,Assistant}/`, `frontend/app/composables/personal/` |
 | Textes de l'interface | `frontend/app/lang/personal/<langue>/*.json`, chargés par `frontend/app/plugins/personal-i18n.ts` |
 | Déploiement NAS | `deploy/nas/` |
+| Pont de prix (facultatif) | `deploy/nas/price-bridge/` ; l'application le joint par la variable d'environnement `PE_PRICE_SOURCE_URL` |
 | Image | `.github/workflows/personal-image.yml` |
 
 ## Les cinq fichiers de Mealie que le fork modifie
@@ -45,6 +46,10 @@ quelques lignes.
 
 Fichiers générés propres au fork, à ne pas modifier à la main : `mealie/schema/personal/__init__.py` et
 `frontend/app/lib/api/types/personal.ts`.
+
+`mise run dev:generate` réécrit aussi des fichiers générés de Mealie (`mealie/schema/*/__init__.py`,
+`frontend/app/lib/api/types/*.ts`, `tests/utils/api_routes/__init__.py`). Ces changements ne font pas
+partie du fork : ne committer que les deux fichiers ci-dessus.
 
 ## Apparence
 

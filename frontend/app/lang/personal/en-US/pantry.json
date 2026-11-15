@@ -1,9 +1,10 @@
 {
   "title": "Pantry",
-  "subtitle": "What you have at home, the pack sizes you buy, and the products of Swiss shops.",
+  "subtitle": "What you have at home, the pack sizes you buy, your prices, and the products of Swiss shops.",
   "tabs": {
     "stock": "Stock",
     "packagings": "Pack sizes",
+    "prices": "Prices",
     "products": "Products"
   },
   "stock": {

@@ -145,3 +145,39 @@ class RetailStore(StrEnum):
     MIGROS = "migros"
     ALDI = "aldi"
     LIDL = "lidl"
+
+
+class PriceSizeUnit(StrEnum):
+    """The units in which a shop states the size of a pack."""
+
+    GRAM = "g"
+    KILOGRAM = "kg"
+    MILLILITER = "ml"
+    LITER = "l"
+    PIECE = "piece"
+
+
+class PriceSourceKind(StrEnum):
+    """Where a stored price comes from."""
+
+    MANUAL = "manual"
+    SWISSGROCERIES = "swissgroceries"
+
+
+class IdeaKind(StrEnum):
+    """What a card of the idea feed points to."""
+
+    RECIPE = "RECIPE"
+    INSPIRATION = "INSPIRATION"
+
+
+class IdeaTagKind(StrEnum):
+    """The families of tags of the idea feed."""
+
+    STOCK = "STOCK"
+    TIME = "TIME"
+    SEASON = "SEASON"
+    DIET = "DIET"
+    BUDGET = "BUDGET"
+    HISTORY = "HISTORY"
+    LABEL = "LABEL"

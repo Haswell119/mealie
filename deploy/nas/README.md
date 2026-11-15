@@ -8,6 +8,7 @@ propres volumes. Elle ne modifie aucune autre application du NAS.
 | `mealie` | l'application | un seul, choisi après l'audit, sur une seule interface |
 | `postgres` | la base de données | aucun |
 | `backup` | sauvegarde chiffrée quotidienne | aucun |
+| `price-bridge` | prix des magasins (facultatif, éteint par défaut) | aucun |
 
 ## En bref : déployer depuis son poste
 
@@ -136,8 +137,61 @@ en-têtes `Host`, `X-Forwarded-For` et `X-Forwarded-Proto`.
    cœliaque : Gluten, sévérité stricte, portée « Toute la préparation », « S'applique quand cette
    personne cuisine ».
 2. **Vérifications** → marquer « vérifié » les aliments dont vous avez lu l'étiquette.
-3. **Stocks** → saisir le stock et les tailles de paquets.
+3. **Stocks** → saisir le stock, les tailles de paquets et, dans l'onglet **Prix**, ce que vous
+   payez pour les aliments que vous achetez souvent. Le budget s'affiche alors dans chaque plan de
+   courses, et le coût par portion dans la page **Idées**.
 4. **Assistant IA** (facultatif) → voir `docs/personal-edition/infomaniak.md`.
+
+## Prix des magasins (facultatif)
+
+Sans rien activer, les prix se saisissent à la main dans **Stocks → Prix**, et le budget fonctionne.
+
+Le service `price-bridge` ajoute la recherche des prix du jour chez Coop, Migros, Aldi et Lidl, et
+la mise à jour des prix déjà gardés. Il est **éteint par défaut**. Avant de l'allumer, savoir que :
+
+- il installe, à la construction de son image, le paquet npm
+  [`@nicktcode/swissgroceries-mcp`](https://www.npmjs.com/package/@nicktcode/swissgroceries-mcp),
+  un programme tiers qui lit les sites publics des enseignes. Ce dépôt n'en contient pas le code.
+  Sa licence (PolyForm Shield 1.0.0) autorise l'usage personnel ; la lire avant de construire ;
+- ce programme n'est ni écrit ni vérifié par ce projet. Il tourne donc à l'écart : aucun secret,
+  aucun volume, aucun port publié, système de fichiers en lecture seule, et un réseau (`prices`)
+  qu'il ne partage qu'avec `mealie` — il ne voit pas la base de données ;
+- Mealie ne lui envoie que le texte recherché et le nom des enseignes ; jamais rien sur une
+  personne. Les enseignes voient l'adresse IP du NAS, comme pour une visite de leur site ;
+- les enseignes peuvent changer leur site : une enseigne peut cesser de répondre sans prévenir
+  (Lidl ne publie qu'une partie de son assortiment). L'application le signale et continue.
+
+Pour l'allumer, écrire dans `.env` :
+
+```bash
+COMPOSE_PROFILES=prices
+PE_PRICE_SOURCE_URL=http://price-bridge:8080
+```
+
+```bash
+docker compose up -d --build
+```
+
+Vérifier que le service répond, puis chercher un produit dans **Stocks → Prix** :
+
+```bash
+docker compose exec price-bridge wget -q -O - http://127.0.0.1:8080/health
+```
+
+Pour l'éteindre : retirer les deux lignes de `.env`, puis
+
+```bash
+docker compose --profile prices rm --stop --force price-bridge
+```
+
+```bash
+docker compose up -d
+```
+
+Les prix déjà gardés restent ; ils ne sont simplement plus mis à jour.
+
+La version du programme tiers est fixée dans `price-bridge/Dockerfile` (`PRICE_SERVICE_VERSION`).
+La changer est une décision : relire son journal des modifications avant.
 
 ## Sauvegardes
 

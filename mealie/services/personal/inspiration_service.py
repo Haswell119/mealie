@@ -129,6 +129,8 @@ class InspirationService:
                 name=draft.name.strip(),
                 description=draft.description or "",
                 recipe_servings=draft.recipe_servings,
+                total_time=f"{draft.minutes} minutes" if draft.minutes else None,
+                total_time_seconds=draft.minutes * 60 if draft.minutes else None,
                 org_url=inspiration.url,
                 recipe_ingredient=[RecipeIngredient(note=line) for line in ingredients],
                 recipe_instructions=[RecipeStep(text=line) for line in instructions],

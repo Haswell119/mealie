@@ -7,6 +7,7 @@ from mealie.services.backups_v2.backup_v2 import BackupV2
 from tests.utils.fixture_schemas import TestUser
 
 from .helpers import BASE, create_food, create_person, create_recipe, restriction_ids, verify_food
+from .test_prices import save_price
 from .test_shopping_plans import add_stock, apply_plan, recipes_plan
 
 
@@ -36,6 +37,18 @@ def test_personal_data_survives_a_native_backup_and_restore(api_client: TestClie
         headers=unique_user.token,
     ).json()
     api_client.post(f"{BASE}/inspirations/{inspiration['id']}/draft", headers=unique_user.token)
+    price = save_price(
+        api_client,
+        unique_user,
+        food,
+        "migros",
+        2.4,
+        size=500,
+        sizeUnit="g",
+        regularPrice=3.0,
+        promotion="-20%",
+        promotionEndsOn="2031-07-01",
+    )
 
     # A restore drops every table. PostgreSQL makes that wait for any open transaction, so end ours first.
     unique_user.repos.session.rollback()
@@ -68,6 +81,11 @@ def test_personal_data_survives_a_native_backup_and_restore(api_client: TestClie
     assert restored_inspiration.tags == ["été", "rapide"]
     assert restored_inspiration.draft.name == "Idée"
 
+    restored_price = restored.pe_food_prices.get_one(price["id"])
+    assert (restored_price.store, restored_price.price, restored_price.size) == ("migros", 2.4, 500)
+    assert restored_price.promotion_ends_on == date(2031, 7, 1)
+    assert isinstance(restored_price.fetched_at, datetime)
+
     status = restored.pe_food_restriction_status.multi_query({"food_id": food.id})[0]
     assert status.status == "VERIFIED"
     assert isinstance(status.verified_at, datetime)
@@ -76,3 +94,5 @@ def test_personal_data_survives_a_native_backup_and_restore(api_client: TestClie
     assert api_client.get(f"{BASE}/persons/{person['id']}", headers=unique_user.token).status_code == 200
     again = apply_plan(api_client, unique_user, plan["id"])
     assert (again["created"], again["updated"], again["deleted"]) == (0, 0, 0)
+    budget = api_client.get(f"{BASE}/shopping-plans/{plan['id']}/budget", headers=unique_user.token)
+    assert budget.status_code == 200, budget.text

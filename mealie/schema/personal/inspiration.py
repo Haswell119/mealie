@@ -18,6 +18,8 @@ class InspirationDraft(MealieModel):
     ingredients: list[str] = []
     instructions: list[str] = []
     notes: str | None = None
+    minutes: int | None = None
+    """The total time of the recipe, in minutes, when the source of the draft states it."""
 
 
 class InspirationCreate(MealieModel):

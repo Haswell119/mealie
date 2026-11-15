@@ -32,7 +32,10 @@
       "IMAGE_TYPE_NOT_ALLOWED": "Utilisez une image JPEG, PNG ou WebP.",
       "IMAGE_TOO_LARGE": "L'image dépasse 10 Mo.",
       "IMAGE_EMPTY": "L'image est vide.",
-      "ASSISTANT_UNAVAILABLE": "L'assistant n'est pas disponible. Rédigez le brouillon à la main."
+      "ASSISTANT_UNAVAILABLE": "L'assistant n'est pas disponible. Rédigez le brouillon à la main.",
+      "PRICE_ABOVE_REGULAR": "Le prix normal ne peut pas être inférieur au prix.",
+      "PRICE_EXISTS": "Cet aliment a déjà un prix dans ce magasin.",
+      "IDEAS_UNAVAILABLE": "L'assistant n'est pas disponible. Le fil d'idées continue de fonctionner sans lui."
     },
     "not_found": {
       "Not found.": "Introuvable.",
@@ -56,7 +59,8 @@
       "No product with this barcode.": "Aucun produit avec ce code-barres.",
       "Proposal not found.": "Proposition introuvable.",
       "Inspiration not found.": "Inspiration introuvable.",
-      "This inspiration has no image.": "Cette inspiration n'a pas d'image."
+      "This inspiration has no image.": "Cette inspiration n'a pas d'image.",
+      "Price not found.": "Prix introuvable."
     }
   }
 }

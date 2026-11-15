@@ -11,8 +11,13 @@ import type {
   FoodComplianceOut,
   FoodPackagingCreate,
   FoodPackagingOut,
+  FoodPriceCreate,
+  FoodPriceOut,
   FoodRestrictionStatusOut,
   FoodRestrictionStatusUpdate,
+  IdeaFeedOut,
+  IdeaGenerateOut,
+  IdeaGenerateRequest,
   InspirationCreate,
   InspirationOut,
   InspirationUpdate,
@@ -30,11 +35,16 @@ import type {
   PantryReceiveOut,
   PersonCreate,
   PersonOut,
+  PlanBudgetOut,
+  PriceOfferSearchOut,
+  PriceRefreshOut,
+  PriceSourceStatus,
   ProductImport,
   ProductImportOut,
   ProductOut,
   ProductSearchOut,
   RecipeComplianceOut,
+  RecipeCostOut,
   RetailStore,
   ShoppingPlanApply,
   ShoppingPlanApplyOut,
@@ -164,6 +174,10 @@ export class ShoppingPlansApi extends BaseCRUDAPI<ShoppingPlanCreate, ShoppingPl
   async consume(id: string) {
     return await this.requests.post<ShoppingPlanConsumeOut>(`${this.itemRoute(id)}/consume`, {});
   }
+
+  async getBudget(id: string) {
+    return await this.requests.get<PlanBudgetOut>(`${this.itemRoute(id)}/budget`);
+  }
 }
 
 export class PantryApi extends BaseCRUDAPI<PantryItemCreate, PantryItemOut> {
@@ -205,6 +219,55 @@ export class ProductsApi extends BaseAPI {
 
   async deleteOne(id: string) {
     return await this.requests.delete<ProductOut>(`${prefix}/products/${id}`);
+  }
+}
+
+export class PricesApi extends BaseCRUDAPI<FoodPriceCreate, FoodPriceOut> {
+  constructor(requests: ApiRequestInstance) {
+    super(requests, `${prefix}/prices`, id => `${prefix}/prices/${id}`);
+  }
+
+  async getStatus() {
+    return await this.requests.get<PriceSourceStatus>(`${prefix}/prices/status`);
+  }
+
+  async searchOffers(query: string, store?: RetailStore | null) {
+    return await this.requests.get<PriceOfferSearchOut>(route(`${prefix}/prices/offers`, store ? { query, store } : { query }));
+  }
+
+  async refresh() {
+    return await this.requests.post<PriceRefreshOut>(`${prefix}/prices/refresh`, {});
+  }
+
+  async getRecipeCost(recipeId: string) {
+    return await this.requests.get<RecipeCostOut>(`${prefix}/prices/recipes/${recipeId}`);
+  }
+}
+
+export interface IdeaFeedQuery {
+  tags?: string[];
+  search?: string;
+  restrictions?: string[];
+  maxCost?: number;
+  includeIncompatible?: boolean;
+  limit?: number;
+  offset?: number;
+  seed?: string;
+}
+
+export class IdeasApi extends BaseAPI {
+  async getFeed(query: IdeaFeedQuery = {}) {
+    const params: Record<string, string | number | boolean | string[]> = {};
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== null && value !== "" && !(Array.isArray(value) && !value.length)) {
+        params[key] = value;
+      }
+    }
+    return await this.requests.get<IdeaFeedOut>(route(`${prefix}/ideas`, params));
+  }
+
+  async generate(payload: IdeaGenerateRequest) {
+    return await this.requests.post<IdeaGenerateOut>(`${prefix}/ideas/generate`, payload);
   }
 }
 
@@ -273,6 +336,8 @@ export class PersonalApi {
   public pantry: PantryApi;
   public packagings: PackagingsApi;
   public products: ProductsApi;
+  public prices: PricesApi;
+  public ideas: IdeasApi;
   public inspirations: InspirationsApi;
   public assistant: AssistantApi;
 
@@ -284,6 +349,8 @@ export class PersonalApi {
     this.pantry = new PantryApi(requests);
     this.packagings = new PackagingsApi(requests);
     this.products = new ProductsApi(requests);
+    this.prices = new PricesApi(requests);
+    this.ideas = new IdeasApi(requests);
     this.inspirations = new InspirationsApi(requests);
     this.assistant = new AssistantApi(requests);
   }

@@ -25,6 +25,10 @@ export type FindingCode =
   | "MISSING_SERVINGS"
   | "RECIPE_NOT_FOUND";
 export type VerificationSource = "MANUAL" | "RULE" | "AI_SUGGESTION" | "PRODUCT_LABEL";
+export type PriceSizeUnit = "g" | "kg" | "ml" | "l" | "piece";
+export type PriceSourceKind = "manual" | "swissgroceries";
+export type IdeaKind = "RECIPE" | "INSPIRATION";
+export type IdeaTagKind = "STOCK" | "TIME" | "SEASON" | "DIET" | "BUDGET" | "HISTORY" | "LABEL";
 export type InspirationKind = "LINK" | "PHOTO" | "NOTE" | "VIDEO" | "IDEA";
 export type InspirationStatus = "INSPIRATION" | "DRAFT" | "VALIDATED";
 export type MealCourse = "APERITIF" | "STARTER" | "MAIN" | "SIDE" | "DESSERT" | "OTHER";
@@ -102,6 +106,31 @@ export interface AssistantStatus {
   enabled: boolean;
   providerName: string | null;
   model: string | null;
+}
+export interface BudgetLine {
+  key: string;
+  display: string;
+  foodId: string | null;
+  quantity: number;
+  unitName: string;
+  offers: BudgetOffer[];
+  reason: string | null;
+}
+export interface BudgetOffer {
+  store: string;
+  cost: number;
+  usedCost: number;
+  packs: number | null;
+  label: string | null;
+  onPromotion: boolean;
+}
+export interface BudgetTotal {
+  store: string;
+  total: number;
+  usedTotal: number;
+  pricedLines: number;
+  missingLines: number;
+  promotions: number;
 }
 export interface ChecklistItemOut {
   code: string;
@@ -225,6 +254,68 @@ export interface FoodPackagingSave {
   groupId: string;
   householdId: string;
 }
+export interface FoodPriceCreate {
+  foodId: string;
+  store: string;
+  label?: string | null;
+  brand?: string | null;
+  price: number;
+  regularPrice?: number | null;
+  size?: number | null;
+  sizeUnit?: PriceSizeUnit | null;
+  byWeight?: boolean;
+  promotion?: string | null;
+  promotionEndsOn?: string | null;
+  source?: PriceSourceKind;
+  externalId?: string | null;
+  productUrl?: string | null;
+  imageUrl?: string | null;
+}
+export interface FoodPriceOut {
+  id: string;
+  groupId: string;
+  householdId: string;
+  foodId: string;
+  food: PersonalFoodSummary;
+  store: string;
+  label: string | null;
+  brand: string | null;
+  price: number;
+  regularPrice: number | null;
+  currency: string;
+  size: number | null;
+  sizeUnit: PriceSizeUnit | null;
+  byWeight: boolean;
+  promotion: string | null;
+  promotionEndsOn: string | null;
+  source: PriceSourceKind;
+  externalId: string | null;
+  productUrl: string | null;
+  imageUrl: string | null;
+  fetchedAt: string | null;
+  updateAt: string | null;
+}
+export interface FoodPriceSave {
+  foodId: string;
+  store: string;
+  label?: string | null;
+  brand?: string | null;
+  price: number;
+  regularPrice?: number | null;
+  size?: number | null;
+  sizeUnit?: PriceSizeUnit | null;
+  byWeight?: boolean;
+  promotion?: string | null;
+  promotionEndsOn?: string | null;
+  source?: PriceSourceKind;
+  externalId?: string | null;
+  productUrl?: string | null;
+  imageUrl?: string | null;
+  groupId: string;
+  householdId: string;
+  currency?: string;
+  fetchedAt?: string | null;
+}
 export interface FoodRestrictionStatusOut {
   id: string;
   foodId: string;
@@ -250,20 +341,50 @@ export interface FoodRestrictionStatusUpdate {
   status: VerificationStatus;
   reason?: string | null;
 }
-export interface InspirationCreate {
+export interface IdeaCard {
+  id: string;
+  kind: IdeaKind;
   title: string;
-  kind?: InspirationKind;
-  url?: string | null;
-  text?: string | null;
-  tags?: string[];
+  description: string | null;
+  recipeSlug: string | null;
+  image: string | null;
+  url: string | null;
+  minutes: number | null;
+  servings: number;
+  stockHave: number;
+  stockTotal: number;
+  missingFoods: string[];
+  seasonalFoods: string[];
+  costPerServing: number | null;
+  promotionStores: string[];
+  compliance: VerificationStatus | null;
+  tags: IdeaTag[];
+  score: number;
 }
-export interface InspirationDraft {
-  name?: string;
-  description?: string | null;
-  recipeServings?: number;
-  ingredients?: string[];
-  instructions?: string[];
-  notes?: string | null;
+export interface IdeaTag {
+  key: string;
+  kind: IdeaTagKind;
+  value: string | null;
+}
+export interface IdeaFeedOut {
+  items: IdeaCard[];
+  total: number;
+  hiddenIncompatible: number;
+  availableTags: IdeaTagCount[];
+  restrictionKeys: string[];
+  month: number;
+  seed: string;
+  assistantEnabled: boolean;
+}
+export interface IdeaTagCount {
+  key: string;
+  kind: IdeaTagKind;
+  value: string | null;
+  count: number;
+}
+export interface IdeaGenerateOut {
+  available: boolean;
+  created: InspirationOut[];
 }
 export interface InspirationOut {
   id: string;
@@ -280,6 +401,28 @@ export interface InspirationOut {
   recipeId: string | null;
   recipeSlug: string | null;
   createdAt: string | null;
+}
+export interface InspirationDraft {
+  name?: string;
+  description?: string | null;
+  recipeServings?: number;
+  ingredients?: string[];
+  instructions?: string[];
+  notes?: string | null;
+  minutes?: number | null;
+}
+export interface IdeaGenerateRequest {
+  count?: number;
+  hint?: string | null;
+  useStock?: boolean;
+  includeConstraints?: boolean;
+}
+export interface InspirationCreate {
+  title: string;
+  kind?: InspirationKind;
+  url?: string | null;
+  text?: string | null;
+  tags?: string[];
 }
 export interface InspirationSave {
   title: string;
@@ -617,6 +760,50 @@ export interface PersonalRecipeSummary {
   recipeServings: number;
   image: string | null;
 }
+export interface PlanBudgetOut {
+  planId: string;
+  currency: string;
+  lineCount: number;
+  stores: BudgetTotal[];
+  best: BudgetTotal | null;
+  lines: BudgetLine[];
+}
+export interface PriceOffer {
+  store: string;
+  externalId: string;
+  name: string;
+  brand: string | null;
+  price: number;
+  regularPrice: number | null;
+  currency: string;
+  size: number | null;
+  sizeUnit: PriceSizeUnit | null;
+  unitPrice: number | null;
+  unitPricePer: string | null;
+  tags: string[];
+  imageUrl: string | null;
+  productUrl: string | null;
+  promotion: string | null;
+  promotionEndsOn: string | null;
+}
+export interface PriceOfferSearchOut {
+  query: string;
+  store: RetailStore | null;
+  available: boolean;
+  offers: PriceOffer[];
+  failedStores: string[];
+}
+export interface PriceRefreshOut {
+  available: boolean;
+  updated: number;
+  unchanged: number;
+  failed: number;
+}
+export interface PriceSourceStatus {
+  enabled: boolean;
+  name: string | null;
+  stores: RetailStore[];
+}
 export interface ProductBase {
   barcode: string;
   name: string;
@@ -695,6 +882,24 @@ export interface RecipeComplianceOut {
     [k: string]: VerificationStatus;
   };
   findings: FindingOut[];
+}
+export interface RecipeCostIngredient {
+  display: string;
+  foodId: string | null;
+  cost: number | null;
+  store: string | null;
+  reason: string | null;
+}
+export interface RecipeCostOut {
+  recipeId: string | null;
+  recipeName: string;
+  servings: number;
+  currency: string;
+  total: number;
+  perServing: number | null;
+  pricedIngredients: number;
+  ingredientCount: number;
+  ingredients: RecipeCostIngredient[];
 }
 export interface ShoppingPlanApply {
   shoppingListId?: string | null;

@@ -323,6 +323,27 @@ d'appétit 0,75 / 1 / 1,25.
 | Colonnes JSON | Type JSON | Texte JSON | La sauvegarde native ne sait pas restaurer des valeurs imbriquées |
 | Clés étrangères vers `users` | Présentes | Supprimées | Elles auraient bloqué la suppression d'un utilisateur |
 | Données produits | Non prévu | Recherche des produits Coop, Migros, Aldi et Lidl par Open Food Facts | Demande ajoutée ; voir la limite ci-dessous |
+| Prix et budget | Non prévu | Table `pe_food_prices` (un prix par aliment et par magasin), budget d'un plan de courses par magasin, coût d'une recette par portion | Demande ajoutée. Les prix se saisissent à la main ; un service facultatif peut les relever (voir la limite ci-dessous) |
+| Fil d'idées | Non prévu | Page « Idées » : recettes et inspirations classées et filtrées par étiquettes (stock, temps, saison, budget, restrictions, historique) | Demande ajoutée. Tout est calculé par l'application ; l'IA ne sert qu'à proposer de nouvelles idées, sur demande |
+
+### Prix, budget et fil d'idées
+
+- **Prix.** `pe_food_prices` garde, par foyer, le prix d'un aliment dans un magasin : prix du paquet,
+  contenu, prix normal et fin de promotion. Le moteur (`engine/pricing.py`) arrondit au paquet entier,
+  sauf pour un aliment vendu au poids, et ne mélange jamais des pièces avec un poids ou un volume. Une
+  promotion terminée redonne le prix normal.
+- **Budget.** `GET /api/households/shopping-plans/{id}/budget` reprend les lignes « à acheter » du plan
+  et donne un total par magasin, plus un total « au meilleur prix de chaque article ». Chaque total
+  dit combien d'articles il ne couvre pas : un total partiel n'est jamais présenté comme complet.
+- **Fil d'idées.** `GET /api/households/ideas` renvoie des cartes avec leurs étiquettes. Les recettes
+  qui enfreignent une restriction de l'utilisateur sont masquées par défaut, et le fil dit combien.
+  « Compatible vérifié » n'apparaît que si chaque aliment a été vérifié à la main ; « Semble
+  végétarien » est un indice tiré du nom des ingrédients et le dit. L'ordre change chaque jour.
+- **Nouvelles idées par l'IA.** `POST /api/households/ideas/generate` envoie au fournisseur le mois,
+  les produits de saison, le nom des aliments en stock (désactivable) et l'envie tapée, sans le nom
+  des personnes. Les contraintes alimentaires ne partent que si l'utilisateur le coche, sous forme de
+  consignes de cuisine (« sans gluten »), jamais avec un nom ou un motif. Chaque idée devient une
+  inspiration, jamais une recette, et repasse par les vérifications de l'application.
 
 ### Interface
 
@@ -334,8 +355,17 @@ pour les actions courantes, en-têtes de page communs. Le détail est dans `FORK
 
 - **Produits des enseignes.** Les données viennent d'Open Food Facts, une base ouverte alimentée par
   ses contributeurs. Coop, Migros, Aldi et Lidl ne proposent pas d'API publique, et l'application ne
-  contourne pas les protections de leurs sites. Conséquences : la couverture est partielle et il n'y
-  a pas de prix.
+  contourne pas les protections de leurs sites. Conséquences : la couverture est partielle et cette
+  base ne donne pas de prix.
+- **Prix relevés en magasin.** L'application ne lit elle-même aucun site d'enseigne. Le relevé
+  automatique passe par un service séparé et facultatif (`deploy/nas/price-bridge`), éteint par
+  défaut, qui installe un programme tiers (`@nicktcode/swissgroceries-mcp`, licence PolyForm Shield,
+  usage personnel). Ce programme n'est ni écrit ni vérifié par ce projet, et n'a pas été exécuté
+  pendant le développement : le pont est testé contre un service simulé. Une enseigne peut cesser
+  de répondre sans prévenir. Sans ce service, les prix saisis à la main suffisent au budget.
+- **Saisons.** Le calendrier (`services/personal/data/seasonal_foods.json`) couvre 46 produits
+  courants en Suisse, reconnus par leur nom en français, allemand, italien et anglais. C'est un
+  repère, pas une garantie de provenance.
 - **Infomaniak.** L'intégration n'a pas été essayée avec un compte réel. Elle est testée contre un
   fournisseur simulé (voir `docs/personal-edition/infomaniak.md`).
 - **Substitutions par ligne d'ingrédient.** Une variante est une recette distincte. L'assistant peut

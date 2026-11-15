@@ -74,8 +74,8 @@ esac
 
 echo "2/3 Copie de deploy/nas vers $NAS_SSH:$NAS_DIR…"
 # Le `sed` retire les CR d'une copie de travail Windows. Ni .env ni secrets/ ne sont envoyés.
-tar -C "$here" -cf - docker-compose.yml .env.example README.md audit-nas.sh install.sh upgrade.sh backup \
-    | nas "mkdir -p '$NAS_DIR' && cd '$NAS_DIR' && tar -xof - && sed -i 's/\r\$//' *.sh *.yml .env.example backup/*"
+tar -C "$here" -cf - docker-compose.yml .env.example README.md audit-nas.sh install.sh upgrade.sh backup price-bridge \
+    | nas "mkdir -p '$NAS_DIR' && cd '$NAS_DIR' && tar -xof - && sed -i 's/\r\$//' *.sh *.yml .env.example backup/* price-bridge/Dockerfile price-bridge/*.mjs price-bridge/test/*"
 
 echo "3/3 Installation sur le NAS…"
 nas "cd '$NAS_DIR' && sh ./install.sh '$image'"

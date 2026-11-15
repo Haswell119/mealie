@@ -274,6 +274,11 @@
         </v-card-text>
       </v-card>
 
+      <ShoppingPlanBudget
+        ref="budget"
+        :plan-id="planId"
+      />
+
       <h2 class="text-title-large mb-1">
         {{ $t('personal.shopping.detail.lines-title') }} ({{ lines.length }})
       </h2>
@@ -319,6 +324,7 @@ import ShoppingPlanForm, {
   shoppingPlanFormPayload,
 } from "~/components/Domain/ShoppingPlan/ShoppingPlanForm.vue";
 import type { ShoppingPlanFormModel } from "~/components/Domain/ShoppingPlan/ShoppingPlanForm.vue";
+import ShoppingPlanBudget from "~/components/Domain/ShoppingPlan/ShoppingPlanBudget.vue";
 import ShoppingPlanLineCard from "~/components/Domain/ShoppingPlan/ShoppingPlanLineCard.vue";
 import { usePersonalApi } from "~/composables/personal/use-personal-api";
 import { personalIcons } from "~/composables/personal/use-personal-nav";
@@ -343,6 +349,7 @@ const router = useRouter();
 const planId = computed(() => String(route.params.id));
 
 const plan = ref<ShoppingPlanOut | null>(null);
+const budget = ref<InstanceType<typeof ShoppingPlanBudget> | null>(null);
 const previewLines = ref<ShoppingPlanPreviewLine[]>([]);
 const issues = ref<ShoppingPlanIssue[]>([]);
 const storedNames = ref<Record<string, string>>({});
@@ -428,6 +435,8 @@ async function load() {
   previewLines.value = preview.data.lines;
   issues.value = preview.data.issues;
   storedNames.value = Object.fromEntries((stored.data ?? []).map(line => [line.key, line.display]));
+  // The budget follows the lines: it is read again each time they are computed again.
+  budget.value?.refresh();
   if (!hasDismissed.value) {
     restoreDismissed.value = false;
   }

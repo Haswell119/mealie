@@ -33,9 +33,9 @@ def test_every_personal_model_has_the_table_prefix():
 
 def test_personal_tables_exist_after_startup():
     expected = {name for name in SqlAlchemyBase.metadata.tables if name.startswith(personal_migrations.TABLE_PREFIX)}
-    assert len(expected) == 20
+    assert len(expected) == 21
     assert expected <= table_names()
-    assert personal_migrations.current_version() == "pe0001"
+    assert personal_migrations.current_version() == "pe0002"
 
 
 def test_personal_migrations_leave_the_history_of_mealie_alone():
@@ -60,10 +60,10 @@ def test_downgrade_removes_every_personal_table_and_nothing_else():
         personal_migrations.upgrade()
 
     assert table_names() == before
-    assert personal_migrations.current_version() == "pe0001"
+    assert personal_migrations.current_version() == "pe0002"
 
 
 def test_restore_hook_ignores_a_backup_of_an_unmodified_mealie():
     personal_migrations.upgrade_for_restore({"alembic_version": [{"version_num": "f3a1ae61d772"}]})
     personal_migrations.upgrade_for_restore({personal_migrations.VERSION_TABLE: []})
-    assert personal_migrations.current_version() == "pe0001"
+    assert personal_migrations.current_version() == "pe0002"

@@ -1,6 +1,7 @@
 import {
   mdiAccountGroup,
   mdiCartArrowDown,
+  mdiCompassOutline,
   mdiFridgeOutline,
   mdiHomeVariantOutline,
   mdiLightbulbOnOutline,
@@ -18,6 +19,7 @@ export const personalIcons = {
   pantry: mdiFridgeOutline,
   shopping: mdiCartArrowDown,
   inspirations: mdiLightbulbOnOutline,
+  ideas: mdiCompassOutline,
   assistant: mdiRobotOutline,
   dietary: mdiShieldCheckOutline,
 };
@@ -33,12 +35,14 @@ export function usePersonalTopLinks() {
 
 /**
  * The sidebar entries of the personal edition, in the order a person uses them. They follow the native
- * shopping lists: first what belongs to shopping, then what belongs to hosting, then ideas and the assistant.
+ * shopping lists: first what to cook, then what belongs to shopping, then what belongs to hosting, then the
+ * notes of the user and the assistant.
  */
 export function usePersonalSidebarLinks() {
   const i18n = useI18n();
 
   return computed<SideBarLink[]>(() => [
+    { icon: personalIcons.ideas, to: "/ideas", title: i18n.t("personal.nav.ideas"), restricted: true },
     { icon: personalIcons.shopping, to: "/shopping-plans", title: i18n.t("personal.nav.shopping-plans"), restricted: true },
     { icon: personalIcons.pantry, to: "/pantry", title: i18n.t("personal.nav.pantry"), restricted: true },
     { icon: personalIcons.events, to: "/events", title: i18n.t("personal.nav.events"), restricted: true },

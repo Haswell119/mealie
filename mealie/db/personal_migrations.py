@@ -28,7 +28,7 @@ TABLE_PREFIX = "pe_"
 DATETIME_COLUMNS = frozenset(
     {"starts_at", "consent_given_at", "verified_at", "computed_at", "confirmed_at", "decided_at", "fetched_at"}
 )
-DATE_COLUMNS = frozenset({"date_from", "date_to", "expires_on"})
+DATE_COLUMNS = frozenset({"date_from", "date_to", "expires_on", "promotion_ends_on"})
 
 logger = get_logger()
 

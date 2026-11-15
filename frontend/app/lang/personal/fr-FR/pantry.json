@@ -1,9 +1,10 @@
 {
   "title": "Stocks",
-  "subtitle": "Ce que vous avez à la maison, les tailles de paquets que vous achetez, et les produits des magasins suisses.",
+  "subtitle": "Ce que vous avez à la maison, les tailles de paquets que vous achetez, vos prix, et les produits des magasins suisses.",
   "tabs": {
     "stock": "Stock",
     "packagings": "Conditionnements",
+    "prices": "Prix",
     "products": "Produits"
   },
   "stock": {

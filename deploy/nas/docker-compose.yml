@@ -41,12 +41,15 @@ services:
       POSTGRES_SERVER: postgres
       POSTGRES_PORT: "5432"
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      # Vide : pas de relevé automatique des prix. Voir « Prix des magasins » dans README.md.
+      PE_PRICE_SOURCE_URL: ${PE_PRICE_SOURCE_URL:-}
     secrets:
       - postgres_password
     volumes:
       - mealie-data:/app/data
     networks:
       - internal
+      - prices
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -104,6 +107,30 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  # Facultatif : ne démarre que si COMPOSE_PROFILES=prices est écrit dans .env.
+  # Ce service lit les prix publics de Coop, Migros, Aldi et Lidl. Il n'a aucun secret, aucun volume,
+  # aucun port publié, et il ne voit pas la base de données : il est seul avec `mealie` sur le réseau `prices`.
+  price-bridge:
+    profiles: ["prices"]
+    build:
+      context: ./price-bridge
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Zurich}
+    networks:
+      - prices
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+
 secrets:
   postgres_password:
     file: ./secrets/postgres_password.txt
@@ -116,4 +143,6 @@ volumes:
 
 networks:
   internal:
+    driver: bridge
+  prices:
     driver: bridge
