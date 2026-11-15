@@ -186,7 +186,7 @@
       </v-chip>
     </div>
     <v-row
-      dense
+      density="compact"
       align="center"
     >
       <v-col
@@ -236,7 +236,7 @@
       {{ $t('personal.dietary.tools-help') }}
     </p>
     <v-row
-      dense
+      density="compact"
       align="center"
     >
       <v-col

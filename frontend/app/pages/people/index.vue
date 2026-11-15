@@ -86,7 +86,7 @@
               </v-btn>
             </div>
             <v-row
-              dense
+              density="compact"
               class="mt-2"
             >
               <v-col
