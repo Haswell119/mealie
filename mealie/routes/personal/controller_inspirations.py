@@ -38,6 +38,7 @@ class InspirationController(BaseUserController):
     @router.get("", response_model=InspirationPagination)
     def get_all(self, q: PaginationQuery = Depends(PaginationQuery)):
         response = self.repos.pe_inspirations.page_all(pagination=q, override=InspirationOut)
+        response.items = [self.service.with_recipe_slug(item) for item in response.items]
         response.set_pagination_guides(router.url_path_for("get_all"), q.model_dump())
         return response
 

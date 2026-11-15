@@ -31,9 +31,9 @@
           :label="$t('personal.people.is-me')"
           data-testid="person-is-me"
         />
-        <p class="text-caption text-medium-emphasis mb-3">
+        <div class="text-caption text-medium-emphasis mb-3">
           {{ $t('personal.people.is-me-help') }}
-        </p>
+        </div>
 
         <template v-if="!form.isMe">
           <v-switch
@@ -43,9 +43,9 @@
             :label="$t('personal.people.consent')"
             data-testid="person-consent"
           />
-          <p class="text-caption text-medium-emphasis mb-3">
+          <div class="text-caption text-medium-emphasis mb-3">
             {{ $t('personal.people.consent-help') }}
-          </p>
+          </div>
           <v-text-field
             v-if="form.consentGiven"
             v-model="form.consentNote"

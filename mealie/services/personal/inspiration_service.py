@@ -42,7 +42,8 @@ class InspirationService:
     def _scope(self) -> dict:
         return {"group_id": self.repos.group_id, "household_id": self.repos.household_id}
 
-    def _out(self, inspiration: InspirationOut) -> InspirationOut:
+    def with_recipe_slug(self, inspiration: InspirationOut) -> InspirationOut:
+        """Add the slug of the recipe that a validated inspiration became, so that a client can link to it."""
         if inspiration.recipe_id is not None:
             recipes = get_repositories(self.repos.session, group_id=self.repos.group_id, household_id=None).recipes
             recipe = recipes.get_one(inspiration.recipe_id, "id")
@@ -53,7 +54,7 @@ class InspirationService:
         inspiration = self.inspirations.get_one(inspiration_id)
         if inspiration is None:
             raise PersonalNotFound("Inspiration not found.")
-        return self._out(inspiration)
+        return self.with_recipe_slug(inspiration)
 
     def create(self, data: InspirationCreate) -> InspirationOut:
         self._check(data)
@@ -69,7 +70,7 @@ class InspirationService:
         if data.draft is not None:
             values["draft"] = data.draft.model_dump()
             values["status"] = InspirationStatus.DRAFT
-        return self._out(self.inspirations.update(inspiration_id, values))
+        return self.with_recipe_slug(self.inspirations.update(inspiration_id, values))
 
     def delete(self, inspiration_id: UUID4) -> InspirationOut:
         inspiration = self.get_one(inspiration_id)
@@ -94,7 +95,7 @@ class InspirationService:
         return self.set_draft(inspiration_id, draft)
 
     def set_draft(self, inspiration_id: UUID4, draft: InspirationDraft) -> InspirationOut:
-        return self._out(
+        return self.with_recipe_slug(
             self.inspirations.update(inspiration_id, {"draft": draft.model_dump(), "status": InspirationStatus.DRAFT})
         )
 
@@ -136,7 +137,7 @@ class InspirationService:
         updated = self.inspirations.update(
             inspiration_id, {"status": InspirationStatus.VALIDATED, "recipe_id": recipe.id}
         )
-        return self._out(updated)
+        return self.with_recipe_slug(updated)
 
     # ================================================================
     # Image
@@ -160,7 +161,7 @@ class InspirationService:
         directory.mkdir(parents=True, exist_ok=True)
         filename = f"image.{extension}"
         (directory / filename).write_bytes(content)
-        return self._out(self.inspirations.update(inspiration_id, {"image": filename}))
+        return self.with_recipe_slug(self.inspirations.update(inspiration_id, {"image": filename}))
 
     def image_path(self, inspiration_id: UUID4) -> Path:
         inspiration = self.get_one(inspiration_id)

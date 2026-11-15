@@ -217,6 +217,10 @@ def test_inspiration_workflow_to_a_validated_recipe(api_client: TestClient, uniq
     assert api_client.post(f"{url}/validate", headers=unique_user.token).status_code == 400
     assert api_client.put(url, json=payload, headers=unique_user.token).status_code == 400
 
+    # the list gives the link to the recipe too
+    listed = api_client.get(INSPIRATIONS, params={"perPage": -1}, headers=unique_user.token).json()["items"]
+    assert next(item for item in listed if item["id"] == inspiration["id"])["recipeSlug"] == body["recipeSlug"]
+
 
 def test_inspiration_kinds_filter_and_scoping(api_client: TestClient, unique_user: TestUser, h2_user: TestUser):
     ids = []
