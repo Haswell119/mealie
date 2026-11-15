@@ -1,6 +1,6 @@
 # Mealie Personal Edition — Audit et plan technique
 
-État : **proposition à valider**. Aucune implémentation n'a commencé.
+État : **réalisé** (voir §6). Ce document garde l'audit et la conception d'origine ; les écarts entre le plan et la réalisation sont listés en §6.
 Base auditée : `mealie-next` au commit `c5c68a2` (15 novembre 2026).
 
 ---
@@ -304,3 +304,38 @@ Chaque étape est livrée avec ses tests, `mise run py:check` et `mise run ui:ch
 4. **Construction de l'image** : GitHub Actions vers un registre privé (recommandé, le NAS ne compile pas le frontend) ou construction sur le NAS.
 5. **Langue de l'interface du fork** : français seul, ou français + anglais.
 6. **Facteurs d'appétit** : 0,75 / 1 / 1,25 proposés.
+
+---
+
+## 6. État de réalisation
+
+Les décisions du §5 ont été prises selon les recommandations : variante = recette distincte, suivi des
+tags amont, image construite par GitHub Actions, interface en français et en anglais, facteurs
+d'appétit 0,75 / 1 / 1,25.
+
+### Ce qui a changé par rapport au plan
+
+| Sujet | Plan | Réalisation | Raison |
+|---|---|---|---|
+| Migrations | Branche Alembic `personal` dans l'historique de Mealie | Environnement de migration séparé (`mealie/alembic_personal`) avec sa propre table de version | La branche cassait la restauration de sauvegarde native et empêchait le retour à Mealie d'origine |
+| Fichiers amont modifiés | 7 | 5 (liste dans `FORK.md`) | `alembic.ini`, `_all_models.py` et `nuxt.config.ts` n'ont pas eu besoin d'être touchés ; la sauvegarde native a demandé deux points d'accroche |
+| Grand livre des courses | Lié à l'événement | Lié à un « plan de courses », dont la source est un événement, une plage du planning ou une sélection de recettes | Un seul mécanisme pour les trois sources demandées |
+| Colonnes JSON | Type JSON | Texte JSON | La sauvegarde native ne sait pas restaurer des valeurs imbriquées |
+| Clés étrangères vers `users` | Présentes | Supprimées | Elles auraient bloqué la suppression d'un utilisateur |
+| Données produits | Non prévu | Recherche des produits Coop, Migros, Aldi et Lidl par Open Food Facts | Demande ajoutée ; voir la limite ci-dessous |
+
+### Limites connues
+
+- **Produits des enseignes.** Les données viennent d'Open Food Facts, une base ouverte alimentée par
+  ses contributeurs. Coop, Migros, Aldi et Lidl ne proposent pas d'API publique, et l'application ne
+  contourne pas les protections de leurs sites. Conséquences : la couverture est partielle et il n'y
+  a pas de prix.
+- **Infomaniak.** L'intégration n'a pas été essayée avec un compte réel. Elle est testée contre un
+  fournisseur simulé (voir `docs/personal-edition/infomaniak.md`).
+- **Substitutions par ligne d'ingrédient.** Une variante est une recette distincte. L'assistant peut
+  proposer une variante avec substitutions ; l'application la crée comme nouvelle recette après
+  acceptation.
+- **SQLite.** Le fork vise PostgreSQL. SQLite n'applique pas les clés étrangères : il convient au
+  développement, pas à la production.
+- **Déploiement.** La pile Compose est validée syntaxiquement et ses scripts de sauvegarde et de
+  restauration sont testés contre PostgreSQL, mais rien n'a été déployé sur le NAS.

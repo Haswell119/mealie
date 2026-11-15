@@ -1,0 +1,193 @@
+# Installer Mealie Personal Edition sur un NAS UGREEN
+
+Cette pile Docker Compose est isolée : son propre projet (`mealie-pe`), son propre réseau, ses
+propres volumes. Elle ne modifie aucune autre application du NAS.
+
+| Service | Rôle | Port publié |
+|---|---|---|
+| `mealie` | l'application | un seul, choisi après l'audit, sur une seule interface |
+| `postgres` | la base de données | aucun |
+| `backup` | sauvegarde chiffrée quotidienne | aucun |
+
+## 1. Auditer le NAS (lecture seule)
+
+Copier le dossier `deploy/nas` sur le NAS, puis :
+
+```bash
+sh ./audit-nas.sh
+```
+
+Le script ne crée, ne modifie et ne supprime rien. Il liste les conteneurs, les ports en écoute, les
+projets Compose, les réseaux et l'état de Tailscale, puis propose un port libre. Pour vérifier un
+port précis :
+
+```bash
+sh ./audit-nas.sh 9925
+```
+
+Ne pas continuer tant qu'une ligne marquée `[!!]` reste inexpliquée.
+
+## 2. Préparer la configuration
+
+```bash
+cp .env.example .env
+```
+
+Dans `.env`, renseigner `MEALIE_PORT` (le port confirmé par l'audit), `BASE_URL`, `BACKUP_DIR`,
+`PUID` et `PGID`.
+
+Créer les deux secrets. Ils ne vont ni dans `.env` ni dans le dépôt :
+
+```bash
+openssl rand -base64 36 > secrets/postgres_password.txt
+```
+
+```bash
+openssl rand -base64 48 > secrets/backup_passphrase.txt
+```
+
+```bash
+chmod 600 secrets/*.txt
+```
+
+**Conserver une copie de `backup_passphrase.txt` ailleurs que sur le NAS** (gestionnaire de mots de
+passe). Sans elle, les sauvegardes sont illisibles.
+
+## 3. Obtenir l'image
+
+L'image se construit par GitHub Actions (onglet *Actions* du dépôt → *Personal Edition Image* →
+*Run workflow*, étiquette `3.31.0-pe.1`). Le workflow lance d'abord tous les tests et ne publie
+l'image que s'ils passent. L'image arrive dans `ghcr.io/<votre compte>/mealie-pe`.
+
+Si le dépôt est privé, connecter le NAS au registre une fois :
+
+```bash
+docker login ghcr.io
+```
+
+Variante : construire sur le NAS, en décommentant le bloc `build` de `docker-compose.yml` (prévoir
+environ 4 Go de mémoire et plusieurs minutes).
+
+## 4. Démarrer
+
+```bash
+docker compose up -d
+```
+
+```bash
+docker compose ps
+```
+
+`mealie` doit passer à l'état `healthy`. Le premier démarrage crée les tables de Mealie puis celles
+du fork.
+
+Se connecter avec `changeme@example.com` / `MyPassword`, puis **changer immédiatement l'adresse et
+le mot de passe**.
+
+## 5. Accès privé en HTTPS par Tailscale
+
+L'application n'écoute que sur `127.0.0.1` (réglage `MEALIE_BIND_IP`). Deux façons de l'ouvrir :
+
+**Tailscale Serve** (recommandé : certificat HTTPS automatique, visible seulement depuis votre
+réseau Tailscale, aucun autre conteneur) :
+
+```bash
+tailscale serve --bg --https=443 http://127.0.0.1:9925
+```
+
+Vérifier d'abord avec `tailscale serve status` (affiché par l'audit) qu'aucun service n'occupe déjà
+le port 443 de Tailscale ; sinon choisir un autre port HTTPS, par exemple `--https=8443`.
+`BASE_URL` vaut alors `https://<nom-du-nas>.<votre-tailnet>.ts.net` (avec `:8443` le cas échéant).
+
+**Reverse proxy déjà présent sur le NAS** : y ajouter un hôte qui pointe vers
+`http://127.0.0.1:<MEALIE_PORT>`. Ne pas modifier les hôtes existants. Le proxy doit transmettre les
+en-têtes `Host`, `X-Forwarded-For` et `X-Forwarded-Proto`.
+
+## 6. Premiers réglages dans l'application
+
+1. **Personnes** → créer votre fiche (« C'est moi ») avec vos restrictions. Pour une maladie
+   cœliaque : Gluten, sévérité stricte, portée « Toute la préparation », « S'applique quand cette
+   personne cuisine ».
+2. **Vérifications** → marquer « vérifié » les aliments dont vous avez lu l'étiquette.
+3. **Stocks** → saisir le stock et les tailles de paquets.
+4. **Assistant IA** (facultatif) → voir `docs/personal-edition/infomaniak.md`.
+
+## Sauvegardes
+
+Chaque nuit à `BACKUP_TIME`, le service `backup` écrit dans `BACKUP_DIR` deux fichiers chiffrés en
+AES-256 : la base (`…-db.dump.enc`) et les fichiers (`…-data.tar.gz.enc`). Il vérifie que la base se
+déchiffre et se lit, puis supprime les sauvegardes de plus de `BACKUP_KEEP_DAYS` jours.
+
+Sauvegarde immédiate :
+
+```bash
+docker compose run --rm backup now
+```
+
+Copier régulièrement `BACKUP_DIR` hors du NAS.
+
+### Restaurer
+
+```bash
+docker compose stop mealie
+```
+
+```bash
+docker compose run --rm --entrypoint restore.sh backup /backups/<horodatage>-db.dump.enc
+```
+
+Restaurer les fichiers (images, pièces jointes) :
+
+```bash
+docker compose run --rm --entrypoint sh -v mealie-pe_mealie-data:/restore backup -c 'openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass file:/run/secrets/backup_passphrase -in /backups/<horodatage>-data.tar.gz.enc | tar -C /restore -xzf -'
+```
+
+```bash
+docker compose up -d mealie
+```
+
+**Tester une restauration une fois, juste après l'installation.** Une sauvegarde jamais restaurée
+n'est pas une sauvegarde.
+
+## Mettre à jour
+
+```bash
+sh ./upgrade.sh ghcr.io/<votre compte>/mealie-pe:3.32.0-pe.1
+```
+
+Le script fait une sauvegarde vérifiée, change l'image, redémarre et contrôle l'état de santé. Les
+migrations de Mealie et du fork s'appliquent au démarrage.
+
+## Retour arrière
+
+Trois niveaux, du plus léger au plus radical.
+
+**1. Revenir à l'image précédente** (la mise à jour a échoué) : restaurer la sauvegarde faite par
+`upgrade.sh` (procédure ci-dessus), remettre l'ancienne valeur de `MEALIE_IMAGE` (conservée dans
+`.env.before-upgrade`), puis `docker compose up -d`. Ne jamais démarrer une ancienne image sur une
+base déjà migrée sans restaurer la sauvegarde.
+
+**2. Retirer le fork et garder ses recettes** (revenir à Mealie d'origine) :
+
+```bash
+docker compose exec mealie python -c "from mealie.db import personal_migrations as m; m.downgrade()"
+```
+
+Cette commande supprime toutes les tables du fork (personnes, événements, plans, stocks,
+inspirations). Les recettes, le planning et les listes de courses restent. Remplacer ensuite
+`MEALIE_IMAGE` par l'image officielle de la **même version** (`ghcr.io/mealie-recipes/mealie:v3.31.0`).
+
+**3. Tout supprimer** :
+
+```bash
+docker compose down
+```
+
+Les volumes `mealie-pe_mealie-data` et `mealie-pe_postgres-data` restent en place tant qu'on ne les
+supprime pas explicitement. Aucune autre application du NAS n'est concernée.
+
+## Ce que cette pile ne fait pas
+
+- Elle ne publie rien sur Internet et n'ouvre aucun port sur le routeur.
+- Elle ne publie pas le port de PostgreSQL.
+- Elle ne touche ni aux réseaux, ni aux volumes, ni aux conteneurs des autres projets.
