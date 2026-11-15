@@ -2,8 +2,10 @@
 
 from uuid import UUID
 
+import sqlalchemy as sa
 from fastapi.testclient import TestClient
 
+from mealie.db.models._model_base import SqlAlchemyBase
 from mealie.schema.recipe.recipe import RecipeDraft, RecipeOut
 from mealie.schema.recipe.recipe_ingredient import (
     IngredientFoodOut,
@@ -80,3 +82,29 @@ def verify_food(api_client: TestClient, user: TestUser, food_id, restriction_id:
     )
     assert response.status_code == 200, response.text
     return response.json()
+
+
+def purge_orphans(user: TestUser) -> None:
+    """
+    Delete the rows of the personal edition whose native parent is gone.
+
+    PostgreSQL does this through the delete rules of the foreign keys. SQLite does not enforce foreign
+    keys, so a test that deletes native data on SQLite removes what PostgreSQL would have removed.
+    """
+    session = user.repos.session
+    tables = [table for name, table in SqlAlchemyBase.metadata.tables.items() if name.startswith("pe_")]
+
+    removed = True
+    while removed:
+        removed = False
+        for table in tables:
+            for foreign_key in table.foreign_keys:
+                column = foreign_key.parent
+                target = foreign_key.column
+                orphaned = sa.and_(column.is_not(None), column.not_in(sa.select(target)))
+                if column.nullable and foreign_key.ondelete == "SET NULL":
+                    result = session.execute(sa.update(table).where(orphaned).values({column.name: None}))
+                else:
+                    result = session.execute(sa.delete(table).where(orphaned))
+                removed = removed or result.rowcount > 0
+    session.commit()

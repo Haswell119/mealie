@@ -5,16 +5,32 @@ PostgreSQL enforces foreign keys and SQLite does not, so the checks on what the 
 only run on PostgreSQL. The native call must succeed on both.
 """
 
+import pytest
 from fastapi.testclient import TestClient
 
 from mealie.core.config import get_app_settings
 from tests.utils import api_routes
 from tests.utils.fixture_schemas import TestUser
 
-from .helpers import BASE, create_food, create_person, create_recipe, restriction_ids, verify_food
+from .helpers import (
+    BASE,
+    create_food,
+    create_person,
+    create_recipe,
+    purge_orphans,
+    restriction_ids,
+    verify_food,
+)
 from .test_shopping_plans import add_stock, apply_plan, recipes_plan
 
 ENFORCES_FOREIGN_KEYS = get_app_settings().DB_ENGINE == "postgres"
+
+
+@pytest.fixture(autouse=True)
+def remove_what_postgres_would_remove(unique_user: TestUser):
+    yield
+    if not ENFORCES_FOREIGN_KEYS:
+        purge_orphans(unique_user)
 
 
 def test_native_food_can_be_deleted(api_client: TestClient, unique_user: TestUser):
