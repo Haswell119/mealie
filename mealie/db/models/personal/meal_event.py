@@ -18,9 +18,11 @@ class PeMealEventGuest(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     __table_args__ = (sa.UniqueConstraint("event_id", "person_id", name="pe_meal_event_guests_event_person_key"),)
 
     event_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_events.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    person_id: FilterableColumn[GUID] = mapped_column(GUID, sa.ForeignKey("pe_persons.id"), nullable=False, index=True)
+    person_id: FilterableColumn[GUID] = mapped_column(
+        GUID, sa.ForeignKey("pe_persons.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     person: Mapped[PePerson] = orm.relationship(PePerson, lazy="joined")
     attending: FilterableColumn[bool] = mapped_column(sa.Boolean, default=True, nullable=False)
     appetite_override: FilterableColumn[str | None] = mapped_column(sa.String)
@@ -38,12 +40,14 @@ class PeMealEventMenuVariant(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins
     __tablename__ = "pe_meal_event_menu_variants"
 
     event_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_events.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="CASCADE"), nullable=False, index=True
     )
     menu_item_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_event_menu_items.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_event_menu_items.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    recipe_id: FilterableColumn[GUID] = mapped_column(GUID, sa.ForeignKey("recipes.id"), nullable=False, index=True)
+    recipe_id: FilterableColumn[GUID] = mapped_column(
+        GUID, sa.ForeignKey("recipes.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     label: FilterableColumn[str | None] = mapped_column(sa.String)
     position: FilterableColumn[int] = mapped_column(sa.Integer, default=0, nullable=False)
     portions_override: FilterableColumn[float | None] = mapped_column(sa.Float)
@@ -57,7 +61,7 @@ class PeMealEventMenuItem(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     __tablename__ = "pe_meal_event_menu_items"
 
     event_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_events.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="CASCADE"), nullable=False, index=True
     )
     course: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="MAIN")
     title: FilterableColumn[str | None] = mapped_column(sa.String)
@@ -83,14 +87,16 @@ class PeMealEventAssignment(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins)
     )
 
     event_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_events.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="CASCADE"), nullable=False, index=True
     )
     menu_item_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_event_menu_items.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_event_menu_items.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    person_id: FilterableColumn[GUID] = mapped_column(GUID, sa.ForeignKey("pe_persons.id"), nullable=False, index=True)
+    person_id: FilterableColumn[GUID] = mapped_column(
+        GUID, sa.ForeignKey("pe_persons.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     variant_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_event_menu_variants.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_event_menu_variants.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     @auto_init()
@@ -104,19 +110,21 @@ class PeMealEventOverride(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     __tablename__ = "pe_meal_event_overrides"
 
     event_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_events.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="CASCADE"), nullable=False, index=True
     )
     menu_item_id: FilterableColumn[GUID | None] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_event_menu_items.id"), index=True
+        GUID, sa.ForeignKey("pe_meal_event_menu_items.id", ondelete="CASCADE"), index=True
     )
-    person_id: FilterableColumn[GUID] = mapped_column(GUID, sa.ForeignKey("pe_persons.id"), nullable=False, index=True)
+    person_id: FilterableColumn[GUID] = mapped_column(
+        GUID, sa.ForeignKey("pe_persons.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     restriction_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_dietary_restrictions.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_dietary_restrictions.id", ondelete="CASCADE"), nullable=False, index=True
     )
     restriction: Mapped[PeDietaryRestriction] = orm.relationship(PeDietaryRestriction, lazy="joined")
     scope: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
     reason: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
-    created_by: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("users.id"), index=True)
+    created_by: FilterableColumn[GUID | None] = mapped_column(GUID, index=True)
 
     model_config = AutoInitOptions(exclude={"restriction"})
 
@@ -129,9 +137,9 @@ class PeMealEventHistory(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     __tablename__ = "pe_meal_event_history"
 
     event_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_meal_events.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    user_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("users.id"), index=True)
+    user_id: FilterableColumn[GUID | None] = mapped_column(GUID, index=True)
     action: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
     detail: FilterableColumn[str | None] = mapped_column(sa.String)
 
@@ -146,7 +154,9 @@ class PeMealEvent(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     name: FilterableColumn[str] = mapped_column(sa.String, nullable=False, index=True)
     starts_at: FilterableColumn[datetime | None] = mapped_column(NaiveDateTime, index=True)
     location: FilterableColumn[str | None] = mapped_column(sa.String)
-    cook_person_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("pe_persons.id"), index=True)
+    cook_person_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("pe_persons.id", ondelete="SET NULL"), index=True
+    )
     status: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="DRAFT")
     leftover_portions: FilterableColumn[float] = mapped_column(sa.Float, nullable=False, default=0)
     notes: FilterableColumn[str | None] = mapped_column(sa.String)

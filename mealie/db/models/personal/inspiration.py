@@ -23,7 +23,9 @@ class PeInspiration(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     tags: FilterableColumn[list | None] = mapped_column(JSONText)
     status: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="INSPIRATION", index=True)
     draft: FilterableColumn[dict | None] = mapped_column(JSONText)
-    recipe_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("recipes.id"), index=True)
+    recipe_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("recipes.id", ondelete="SET NULL"), index=True
+    )
 
     @auto_init()
     def __init__(self, **_) -> None:
@@ -39,8 +41,10 @@ class PeAiProposal(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     status: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="PENDING", index=True)
     title: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
     payload: FilterableColumn[dict | None] = mapped_column(JSONText)
-    event_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("pe_meal_events.id"), index=True)
-    created_by: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("users.id"), index=True)
+    event_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="SET NULL"), index=True
+    )
+    created_by: FilterableColumn[GUID | None] = mapped_column(GUID, index=True)
     decided_at: FilterableColumn[datetime | None] = mapped_column(NaiveDateTime)
     result: FilterableColumn[dict | None] = mapped_column(JSONText)
 

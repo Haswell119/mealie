@@ -13,13 +13,17 @@ class PersonalGroupScoped:
     """Columns for a table that belongs to a group."""
 
     id: FilterableColumn[GUID] = mapped_column(GUID, primary_key=True, default=GUID.generate)
-    group_id: FilterableColumn[GUID] = mapped_column(GUID, ForeignKey("groups.id"), nullable=False, index=True)
+    group_id: FilterableColumn[GUID] = mapped_column(
+        GUID, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
 
 class PersonalHouseholdScoped(PersonalGroupScoped):
     """Columns for a table that belongs to a household."""
 
-    household_id: FilterableColumn[GUID] = mapped_column(GUID, ForeignKey("households.id"), nullable=False, index=True)
+    household_id: FilterableColumn[GUID] = mapped_column(
+        GUID, ForeignKey("households.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
 
 class JSONText(TypeDecorator):

@@ -23,12 +23,16 @@ class PeShoppingPlanLine(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     __table_args__ = (sa.UniqueConstraint("plan_id", "key", name="pe_shopping_plan_lines_plan_key_key"),)
 
     plan_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_shopping_plans.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_shopping_plans.id", ondelete="CASCADE"), nullable=False, index=True
     )
     key: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
 
-    food_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("ingredient_foods.id"), index=True)
-    unit_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("ingredient_units.id"), index=True)
+    food_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("ingredient_foods.id", ondelete="SET NULL"), index=True
+    )
+    unit_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("ingredient_units.id", ondelete="SET NULL"), index=True
+    )
     note: FilterableColumn[str | None] = mapped_column(sa.String)
     display: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="")
 
@@ -59,13 +63,15 @@ class PeShoppingPlan(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
 
     name: FilterableColumn[str] = mapped_column(sa.String, nullable=False, index=True)
     source_type: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
-    event_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("pe_meal_events.id"), index=True)
+    event_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("pe_meal_events.id", ondelete="CASCADE"), index=True
+    )
     date_from: FilterableColumn[date | None] = mapped_column(sa.Date)
     date_to: FilterableColumn[date | None] = mapped_column(sa.Date)
     recipes: FilterableColumn[list | None] = mapped_column(JSONText)
 
     shopping_list_id: FilterableColumn[GUID | None] = mapped_column(
-        GUID, sa.ForeignKey("shopping_lists.id"), index=True
+        GUID, sa.ForeignKey("shopping_lists.id", ondelete="SET NULL"), index=True
     )
     status: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="OPEN")
     use_stock: FilterableColumn[bool] = mapped_column(sa.Boolean, nullable=False, default=True)

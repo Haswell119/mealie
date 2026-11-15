@@ -33,7 +33,9 @@ class PeProduct(PersonalGroupScoped, SqlAlchemyBase, BaseMixins):
     source_url: FilterableColumn[str | None] = mapped_column(sa.String)
     fetched_at: FilterableColumn[datetime | None] = mapped_column(NaiveDateTime)
 
-    food_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("ingredient_foods.id"), index=True)
+    food_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("ingredient_foods.id", ondelete="SET NULL"), index=True
+    )
 
     @auto_init()
     def __init__(self, **_) -> None:
@@ -46,16 +48,20 @@ class PeFoodPackaging(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     __tablename__ = "pe_food_packagings"
 
     food_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("ingredient_foods.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("ingredient_foods.id", ondelete="CASCADE"), nullable=False, index=True
     )
     food: Mapped[IngredientFoodModel] = orm.relationship(IngredientFoodModel, lazy="joined")
-    unit_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("ingredient_units.id"), index=True)
+    unit_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("ingredient_units.id", ondelete="SET NULL"), index=True
+    )
     unit: Mapped[IngredientUnitModel | None] = orm.relationship(IngredientUnitModel, lazy="joined")
     quantity: FilterableColumn[float] = mapped_column(sa.Float, nullable=False)
     label: FilterableColumn[str | None] = mapped_column(sa.String)
     store: FilterableColumn[str | None] = mapped_column(sa.String)
     is_default: FilterableColumn[bool] = mapped_column(sa.Boolean, nullable=False, default=True)
-    product_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("pe_products.id"), index=True)
+    product_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("pe_products.id", ondelete="SET NULL"), index=True
+    )
 
     model_config = AutoInitOptions(exclude={"food", "unit"})
 
@@ -70,10 +76,12 @@ class PePantryItem(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     __tablename__ = "pe_pantry_items"
 
     food_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("ingredient_foods.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("ingredient_foods.id", ondelete="CASCADE"), nullable=False, index=True
     )
     food: Mapped[IngredientFoodModel] = orm.relationship(IngredientFoodModel, lazy="joined")
-    unit_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("ingredient_units.id"), index=True)
+    unit_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("ingredient_units.id", ondelete="SET NULL"), index=True
+    )
     unit: Mapped[IngredientUnitModel | None] = orm.relationship(IngredientUnitModel, lazy="joined")
     quantity: FilterableColumn[float] = mapped_column(sa.Float, nullable=False, default=0)
 
@@ -82,7 +90,9 @@ class PePantryItem(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     expires_on: FilterableColumn[date | None] = mapped_column(sa.Date, index=True)
     location: FilterableColumn[str | None] = mapped_column(sa.String)
     note: FilterableColumn[str | None] = mapped_column(sa.String)
-    product_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("pe_products.id"), index=True)
+    product_id: FilterableColumn[GUID | None] = mapped_column(
+        GUID, sa.ForeignKey("pe_products.id", ondelete="SET NULL"), index=True
+    )
 
     model_config = AutoInitOptions(exclude={"food", "unit"})
 

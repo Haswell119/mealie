@@ -19,9 +19,11 @@ class PePersonRestriction(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
         sa.UniqueConstraint("person_id", "restriction_id", name="pe_person_restrictions_person_restriction_key"),
     )
 
-    person_id: FilterableColumn[GUID] = mapped_column(GUID, sa.ForeignKey("pe_persons.id"), nullable=False, index=True)
+    person_id: FilterableColumn[GUID] = mapped_column(
+        GUID, sa.ForeignKey("pe_persons.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     restriction_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_dietary_restrictions.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_dietary_restrictions.id", ondelete="CASCADE"), nullable=False, index=True
     )
     restriction: Mapped[PeDietaryRestriction] = orm.relationship(PeDietaryRestriction, lazy="joined")
 
@@ -41,9 +43,11 @@ class PePersonFoodPreference(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins
     __tablename__ = "pe_person_food_preferences"
     __table_args__ = (sa.UniqueConstraint("person_id", "food_id", name="pe_person_food_preferences_person_food_key"),)
 
-    person_id: FilterableColumn[GUID] = mapped_column(GUID, sa.ForeignKey("pe_persons.id"), nullable=False, index=True)
+    person_id: FilterableColumn[GUID] = mapped_column(
+        GUID, sa.ForeignKey("pe_persons.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     food_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("ingredient_foods.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("ingredient_foods.id", ondelete="CASCADE"), nullable=False, index=True
     )
     food: Mapped[IngredientFoodModel] = orm.relationship(IngredientFoodModel, lazy="joined")
     kind: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
@@ -64,7 +68,7 @@ class PePerson(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     display_name: FilterableColumn[str] = mapped_column(sa.String, nullable=False, index=True)
     appetite: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="NORMAL")
     notes: FilterableColumn[str | None] = mapped_column(sa.String)
-    linked_user_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("users.id"), index=True)
+    linked_user_id: FilterableColumn[GUID | None] = mapped_column(GUID, index=True)
     consent_given_at: FilterableColumn[datetime | None] = mapped_column(NaiveDateTime)
     consent_note: FilterableColumn[str | None] = mapped_column(sa.String)
 

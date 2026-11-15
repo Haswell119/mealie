@@ -1,0 +1,119 @@
+# Mealie Personal Edition — NAS UGREEN
+#
+# Pile isolée : son propre projet Compose, son propre réseau, ses propres volumes.
+# Elle ne touche à aucune autre application du NAS.
+#
+# Avant le premier démarrage : lire deploy/nas/README.md et lancer ./audit-nas.sh.
+
+name: mealie-pe
+
+services:
+  mealie:
+    image: ${MEALIE_IMAGE:?Définir MEALIE_IMAGE dans .env}
+    # Pour construire l'image sur le NAS au lieu de la télécharger, commenter `image` ci-dessus
+    # et décommenter ce bloc (la construction du frontend demande environ 4 Go de RAM) :
+    # build:
+    #   context: ../..
+    #   dockerfile: docker/Dockerfile
+    #   target: production
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      # Aucun port par défaut : le port se choisit après l'audit du NAS.
+      # MEALIE_BIND_IP limite l'écoute à une interface (127.0.0.1 ou l'adresse Tailscale).
+      - "${MEALIE_BIND_IP:-127.0.0.1}:${MEALIE_PORT:?Définir MEALIE_PORT dans .env après ./audit-nas.sh}:9000"
+    environment:
+      TZ: ${TZ:-Europe/Zurich}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      BASE_URL: ${BASE_URL:?Définir BASE_URL dans .env}
+      ALLOW_SIGNUP: "false"
+      API_DOCS: "false"
+      MAX_WORKERS: "1"
+      WEB_CONCURRENCY: "1"
+      DEFAULT_GROUP: ${DEFAULT_GROUP:-Maison}
+      DEFAULT_HOUSEHOLD: ${DEFAULT_HOUSEHOLD:-Famille}
+      DB_ENGINE: postgres
+      POSTGRES_USER: mealie
+      POSTGRES_DB: mealie
+      POSTGRES_SERVER: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - mealie-data:/app/data
+    networks:
+      - internal
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: ${MEALIE_MEMORY_LIMIT:-1500M}
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    # Aucun port publié : la base n'est joignable que depuis le réseau interne de la pile.
+    environment:
+      TZ: ${TZ:-Europe/Zurich}
+      POSTGRES_USER: mealie
+      POSTGRES_DB: mealie
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mealie -d mealie"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+
+  backup:
+    build:
+      context: ./backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-Europe/Zurich}
+      PGHOST: postgres
+      PGUSER: mealie
+      PGDATABASE: mealie
+      PGPASSFILE_SOURCE: /run/secrets/postgres_password
+      BACKUP_PASSPHRASE_FILE: /run/secrets/backup_passphrase
+      BACKUP_TIME: ${BACKUP_TIME:-03:30}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-30}
+    secrets:
+      - postgres_password
+      - backup_passphrase
+    volumes:
+      - mealie-data:/data:ro
+      - ${BACKUP_DIR:?Définir BACKUP_DIR dans .env}:/backups
+    networks:
+      - internal
+    security_opt:
+      - no-new-privileges:true
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  backup_passphrase:
+    file: ./secrets/backup_passphrase.txt
+
+volumes:
+  mealie-data:
+  postgres-data:
+
+networks:
+  internal:
+    driver: bridge

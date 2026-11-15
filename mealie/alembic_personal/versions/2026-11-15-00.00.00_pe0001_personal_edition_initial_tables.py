@@ -31,10 +31,7 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("group_id", "key", name="pe_dietary_restrictions_group_id_key_key"),
     )
@@ -59,18 +56,9 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["recipe_id"],
-            ["recipes.id"],
-        ),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["recipe_id"], ["recipes.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_inspirations", schema=None) as batch_op:
@@ -82,6 +70,30 @@ def upgrade():
         batch_op.create_index(batch_op.f("ix_pe_inspirations_title"), ["title"], unique=False)
 
     op.create_table(
+        "pe_persons",
+        sa.Column("display_name", sa.String(), nullable=False),
+        sa.Column("appetite", sa.String(), nullable=False),
+        sa.Column("notes", sa.String(), nullable=True),
+        sa.Column("linked_user_id", mealie.db.migration_types.GUID(), nullable=True),
+        sa.Column("consent_given_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.Column("consent_note", sa.String(), nullable=True),
+        sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    with op.batch_alter_table("pe_persons", schema=None) as batch_op:
+        batch_op.create_index(batch_op.f("ix_pe_persons_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_persons_display_name"), ["display_name"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_persons_group_id"), ["group_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_persons_household_id"), ["household_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_persons_linked_user_id"), ["linked_user_id"], unique=False)
+
+    op.create_table(
         "pe_tool_restriction_status",
         sa.Column("tool_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("restriction_id", mealie.db.migration_types.GUID(), nullable=False),
@@ -91,18 +103,9 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["restriction_id"],
-            ["pe_dietary_restrictions.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["tool_id"],
-            ["tools.id"],
-        ),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["restriction_id"], ["pe_dietary_restrictions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["tool_id"], ["tools.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tool_id", "restriction_id", name="pe_tool_restriction_status_tool_restriction_key"),
     )
@@ -131,22 +134,9 @@ def upgrade():
             "status != 'VERIFIED' OR (source = 'MANUAL' AND verified_by IS NOT NULL)",
             name="pe_food_restriction_status_verified_is_manual",
         ),
-        sa.ForeignKeyConstraint(
-            ["food_id"],
-            ["ingredient_foods.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["restriction_id"],
-            ["pe_dietary_restrictions.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["verified_by"],
-            ["users.id"],
-        ),
+        sa.ForeignKeyConstraint(["food_id"], ["ingredient_foods.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["restriction_id"], ["pe_dietary_restrictions.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("food_id", "restriction_id", name="pe_food_restriction_status_food_restriction_key"),
     )
@@ -158,123 +148,6 @@ def upgrade():
             batch_op.f("ix_pe_food_restriction_status_restriction_id"), ["restriction_id"], unique=False
         )
         batch_op.create_index(batch_op.f("ix_pe_food_restriction_status_verified_by"), ["verified_by"], unique=False)
-
-    op.create_table(
-        "pe_persons",
-        sa.Column("display_name", sa.String(), nullable=False),
-        sa.Column("appetite", sa.String(), nullable=False),
-        sa.Column("notes", sa.String(), nullable=True),
-        sa.Column("linked_user_id", mealie.db.migration_types.GUID(), nullable=True),
-        sa.Column("consent_given_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("consent_note", sa.String(), nullable=True),
-        sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["linked_user_id"],
-            ["users.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    with op.batch_alter_table("pe_persons", schema=None) as batch_op:
-        batch_op.create_index(batch_op.f("ix_pe_persons_created_at"), ["created_at"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_persons_display_name"), ["display_name"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_persons_group_id"), ["group_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_persons_household_id"), ["household_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_persons_linked_user_id"), ["linked_user_id"], unique=False)
-
-    op.create_table(
-        "pe_products",
-        sa.Column("barcode", sa.String(), nullable=False),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column("brand", sa.String(), nullable=True),
-        sa.Column("stores", sa.Text(), nullable=True),
-        sa.Column("quantity", sa.Float(), nullable=True),
-        sa.Column("quantity_unit", sa.String(), nullable=True),
-        sa.Column("quantity_text", sa.String(), nullable=True),
-        sa.Column("labels", sa.Text(), nullable=True),
-        sa.Column("allergens", sa.Text(), nullable=True),
-        sa.Column("traces", sa.Text(), nullable=True),
-        sa.Column("image_url", sa.String(), nullable=True),
-        sa.Column("source", sa.String(), nullable=False),
-        sa.Column("source_url", sa.String(), nullable=True),
-        sa.Column("fetched_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("food_id", mealie.db.migration_types.GUID(), nullable=True),
-        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["food_id"],
-            ["ingredient_foods.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("group_id", "barcode", name="pe_products_group_id_barcode_key"),
-    )
-    with op.batch_alter_table("pe_products", schema=None) as batch_op:
-        batch_op.create_index(batch_op.f("ix_pe_products_barcode"), ["barcode"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_products_created_at"), ["created_at"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_products_food_id"), ["food_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_products_group_id"), ["group_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_products_name"), ["name"], unique=False)
-
-    op.create_table(
-        "pe_food_packagings",
-        sa.Column("food_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("unit_id", mealie.db.migration_types.GUID(), nullable=True),
-        sa.Column("quantity", sa.Float(), nullable=False),
-        sa.Column("label", sa.String(), nullable=True),
-        sa.Column("store", sa.String(), nullable=True),
-        sa.Column("is_default", sa.Boolean(), nullable=False),
-        sa.Column("product_id", mealie.db.migration_types.GUID(), nullable=True),
-        sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["food_id"],
-            ["ingredient_foods.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["product_id"],
-            ["pe_products.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["unit_id"],
-            ["ingredient_units.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    with op.batch_alter_table("pe_food_packagings", schema=None) as batch_op:
-        batch_op.create_index(batch_op.f("ix_pe_food_packagings_created_at"), ["created_at"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_food_packagings_food_id"), ["food_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_food_packagings_group_id"), ["group_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_food_packagings_household_id"), ["household_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_food_packagings_product_id"), ["product_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_food_packagings_unit_id"), ["unit_id"], unique=False)
 
     op.create_table(
         "pe_meal_events",
@@ -290,18 +163,9 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["cook_person_id"],
-            ["pe_persons.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
+        sa.ForeignKeyConstraint(["cook_person_id"], ["pe_persons.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_meal_events", schema=None) as batch_op:
@@ -311,53 +175,6 @@ def upgrade():
         batch_op.create_index(batch_op.f("ix_pe_meal_events_household_id"), ["household_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_meal_events_name"), ["name"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_meal_events_starts_at"), ["starts_at"], unique=False)
-
-    op.create_table(
-        "pe_pantry_items",
-        sa.Column("food_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("unit_id", mealie.db.migration_types.GUID(), nullable=True),
-        sa.Column("quantity", sa.Float(), nullable=False),
-        sa.Column("confirmed_usable", sa.Boolean(), nullable=False),
-        sa.Column("confirmed_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("expires_on", sa.Date(), nullable=True),
-        sa.Column("location", sa.String(), nullable=True),
-        sa.Column("note", sa.String(), nullable=True),
-        sa.Column("product_id", mealie.db.migration_types.GUID(), nullable=True),
-        sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
-        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["food_id"],
-            ["ingredient_foods.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["product_id"],
-            ["pe_products.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["unit_id"],
-            ["ingredient_units.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    with op.batch_alter_table("pe_pantry_items", schema=None) as batch_op:
-        batch_op.create_index(batch_op.f("ix_pe_pantry_items_created_at"), ["created_at"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_pantry_items_expires_on"), ["expires_on"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_pantry_items_food_id"), ["food_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_pantry_items_group_id"), ["group_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_pantry_items_household_id"), ["household_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_pantry_items_product_id"), ["product_id"], unique=False)
-        batch_op.create_index(batch_op.f("ix_pe_pantry_items_unit_id"), ["unit_id"], unique=False)
 
     op.create_table(
         "pe_person_food_preferences",
@@ -370,22 +187,10 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["food_id"],
-            ["ingredient_foods.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["person_id"],
-            ["pe_persons.id"],
-        ),
+        sa.ForeignKeyConstraint(["food_id"], ["ingredient_foods.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["person_id"], ["pe_persons.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("person_id", "food_id", name="pe_person_food_preferences_person_food_key"),
     )
@@ -409,22 +214,10 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["person_id"],
-            ["pe_persons.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["restriction_id"],
-            ["pe_dietary_restrictions.id"],
-        ),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["person_id"], ["pe_persons.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["restriction_id"], ["pe_dietary_restrictions.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("person_id", "restriction_id", name="pe_person_restrictions_person_restriction_key"),
     )
@@ -434,6 +227,39 @@ def upgrade():
         batch_op.create_index(batch_op.f("ix_pe_person_restrictions_household_id"), ["household_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_person_restrictions_person_id"), ["person_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_person_restrictions_restriction_id"), ["restriction_id"], unique=False)
+
+    op.create_table(
+        "pe_products",
+        sa.Column("barcode", sa.String(), nullable=False),
+        sa.Column("name", sa.String(), nullable=False),
+        sa.Column("brand", sa.String(), nullable=True),
+        sa.Column("stores", sa.Text(), nullable=True),
+        sa.Column("quantity", sa.Float(), nullable=True),
+        sa.Column("quantity_unit", sa.String(), nullable=True),
+        sa.Column("quantity_text", sa.String(), nullable=True),
+        sa.Column("labels", sa.Text(), nullable=True),
+        sa.Column("allergens", sa.Text(), nullable=True),
+        sa.Column("traces", sa.Text(), nullable=True),
+        sa.Column("image_url", sa.String(), nullable=True),
+        sa.Column("source", sa.String(), nullable=False),
+        sa.Column("source_url", sa.String(), nullable=True),
+        sa.Column("fetched_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.Column("food_id", mealie.db.migration_types.GUID(), nullable=True),
+        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.ForeignKeyConstraint(["food_id"], ["ingredient_foods.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("group_id", "barcode", name="pe_products_group_id_barcode_key"),
+    )
+    with op.batch_alter_table("pe_products", schema=None) as batch_op:
+        batch_op.create_index(batch_op.f("ix_pe_products_barcode"), ["barcode"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_products_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_products_food_id"), ["food_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_products_group_id"), ["group_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_products_name"), ["name"], unique=False)
 
     op.create_table(
         "pe_ai_proposals",
@@ -450,22 +276,9 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["created_by"],
-            ["users.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_ai_proposals", schema=None) as batch_op:
@@ -475,6 +288,35 @@ def upgrade():
         batch_op.create_index(batch_op.f("ix_pe_ai_proposals_group_id"), ["group_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_ai_proposals_household_id"), ["household_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_ai_proposals_status"), ["status"], unique=False)
+
+    op.create_table(
+        "pe_food_packagings",
+        sa.Column("food_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("unit_id", mealie.db.migration_types.GUID(), nullable=True),
+        sa.Column("quantity", sa.Float(), nullable=False),
+        sa.Column("label", sa.String(), nullable=True),
+        sa.Column("store", sa.String(), nullable=True),
+        sa.Column("is_default", sa.Boolean(), nullable=False),
+        sa.Column("product_id", mealie.db.migration_types.GUID(), nullable=True),
+        sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.ForeignKeyConstraint(["food_id"], ["ingredient_foods.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["product_id"], ["pe_products.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(["unit_id"], ["ingredient_units.id"], ondelete="SET NULL"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    with op.batch_alter_table("pe_food_packagings", schema=None) as batch_op:
+        batch_op.create_index(batch_op.f("ix_pe_food_packagings_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_food_packagings_food_id"), ["food_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_food_packagings_group_id"), ["group_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_food_packagings_household_id"), ["household_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_food_packagings_product_id"), ["product_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_food_packagings_unit_id"), ["unit_id"], unique=False)
 
     op.create_table(
         "pe_meal_event_guests",
@@ -487,22 +329,10 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["person_id"],
-            ["pe_persons.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["person_id"], ["pe_persons.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("event_id", "person_id", name="pe_meal_event_guests_event_person_key"),
     )
@@ -524,22 +354,9 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["users.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_meal_event_history", schema=None) as batch_op:
@@ -560,18 +377,9 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_meal_event_menu_items", schema=None) as batch_op:
@@ -579,6 +387,38 @@ def upgrade():
         batch_op.create_index(batch_op.f("ix_pe_meal_event_menu_items_event_id"), ["event_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_meal_event_menu_items_group_id"), ["group_id"], unique=False)
         batch_op.create_index(batch_op.f("ix_pe_meal_event_menu_items_household_id"), ["household_id"], unique=False)
+
+    op.create_table(
+        "pe_pantry_items",
+        sa.Column("food_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("unit_id", mealie.db.migration_types.GUID(), nullable=True),
+        sa.Column("quantity", sa.Float(), nullable=False),
+        sa.Column("confirmed_usable", sa.Boolean(), nullable=False),
+        sa.Column("confirmed_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.Column("expires_on", sa.Date(), nullable=True),
+        sa.Column("location", sa.String(), nullable=True),
+        sa.Column("note", sa.String(), nullable=True),
+        sa.Column("product_id", mealie.db.migration_types.GUID(), nullable=True),
+        sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
+        sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
+        sa.ForeignKeyConstraint(["food_id"], ["ingredient_foods.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["product_id"], ["pe_products.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(["unit_id"], ["ingredient_units.id"], ondelete="SET NULL"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    with op.batch_alter_table("pe_pantry_items", schema=None) as batch_op:
+        batch_op.create_index(batch_op.f("ix_pe_pantry_items_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_pantry_items_expires_on"), ["expires_on"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_pantry_items_food_id"), ["food_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_pantry_items_group_id"), ["group_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_pantry_items_household_id"), ["household_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_pantry_items_product_id"), ["product_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_pe_pantry_items_unit_id"), ["unit_id"], unique=False)
 
     op.create_table(
         "pe_shopping_plans",
@@ -598,22 +438,10 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["shopping_list_id"],
-            ["shopping_lists.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["shopping_list_id"], ["shopping_lists.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_shopping_plans", schema=None) as batch_op:
@@ -637,26 +465,11 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["menu_item_id"],
-            ["pe_meal_event_menu_items.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["recipe_id"],
-            ["recipes.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["menu_item_id"], ["pe_meal_event_menu_items.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["recipe_id"], ["recipes.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_meal_event_menu_variants", schema=None) as batch_op:
@@ -681,34 +494,12 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["created_by"],
-            ["users.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["menu_item_id"],
-            ["pe_meal_event_menu_items.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["person_id"],
-            ["pe_persons.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["restriction_id"],
-            ["pe_dietary_restrictions.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["menu_item_id"], ["pe_meal_event_menu_items.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["person_id"], ["pe_persons.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["restriction_id"], ["pe_dietary_restrictions.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("pe_meal_event_overrides", schema=None) as batch_op:
@@ -745,26 +536,11 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["food_id"],
-            ["ingredient_foods.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["plan_id"],
-            ["pe_shopping_plans.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["unit_id"],
-            ["ingredient_units.id"],
-        ),
+        sa.ForeignKeyConstraint(["food_id"], ["ingredient_foods.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["plan_id"], ["pe_shopping_plans.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["unit_id"], ["ingredient_units.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("plan_id", "key", name="pe_shopping_plan_lines_plan_key_key"),
     )
@@ -790,30 +566,12 @@ def upgrade():
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("created_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
         sa.Column("update_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["event_id"],
-            ["pe_meal_events.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_id"],
-            ["groups.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["household_id"],
-            ["households.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["menu_item_id"],
-            ["pe_meal_event_menu_items.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["person_id"],
-            ["pe_persons.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["variant_id"],
-            ["pe_meal_event_menu_variants.id"],
-        ),
+        sa.ForeignKeyConstraint(["event_id"], ["pe_meal_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["group_id"], ["groups.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["household_id"], ["households.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["menu_item_id"], ["pe_meal_event_menu_items.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["person_id"], ["pe_persons.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["variant_id"], ["pe_meal_event_menu_variants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("menu_item_id", "person_id", name="pe_meal_event_assignments_menu_item_person_key"),
     )
@@ -880,6 +638,16 @@ def downgrade():
         batch_op.drop_index(batch_op.f("ix_pe_shopping_plans_created_at"))
 
     op.drop_table("pe_shopping_plans")
+    with op.batch_alter_table("pe_pantry_items", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_unit_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_product_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_household_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_group_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_food_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_expires_on"))
+        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_created_at"))
+
+    op.drop_table("pe_pantry_items")
     with op.batch_alter_table("pe_meal_event_menu_items", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_pe_meal_event_menu_items_household_id"))
         batch_op.drop_index(batch_op.f("ix_pe_meal_event_menu_items_group_id"))
@@ -903,6 +671,15 @@ def downgrade():
         batch_op.drop_index(batch_op.f("ix_pe_meal_event_guests_created_at"))
 
     op.drop_table("pe_meal_event_guests")
+    with op.batch_alter_table("pe_food_packagings", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_unit_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_product_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_household_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_group_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_food_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_created_at"))
+
+    op.drop_table("pe_food_packagings")
     with op.batch_alter_table("pe_ai_proposals", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_pe_ai_proposals_status"))
         batch_op.drop_index(batch_op.f("ix_pe_ai_proposals_household_id"))
@@ -912,6 +689,14 @@ def downgrade():
         batch_op.drop_index(batch_op.f("ix_pe_ai_proposals_created_at"))
 
     op.drop_table("pe_ai_proposals")
+    with op.batch_alter_table("pe_products", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_pe_products_name"))
+        batch_op.drop_index(batch_op.f("ix_pe_products_group_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_products_food_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_products_created_at"))
+        batch_op.drop_index(batch_op.f("ix_pe_products_barcode"))
+
+    op.drop_table("pe_products")
     with op.batch_alter_table("pe_person_restrictions", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_pe_person_restrictions_restriction_id"))
         batch_op.drop_index(batch_op.f("ix_pe_person_restrictions_person_id"))
@@ -928,16 +713,6 @@ def downgrade():
         batch_op.drop_index(batch_op.f("ix_pe_person_food_preferences_created_at"))
 
     op.drop_table("pe_person_food_preferences")
-    with op.batch_alter_table("pe_pantry_items", schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_unit_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_product_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_household_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_group_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_food_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_expires_on"))
-        batch_op.drop_index(batch_op.f("ix_pe_pantry_items_created_at"))
-
-    op.drop_table("pe_pantry_items")
     with op.batch_alter_table("pe_meal_events", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_pe_meal_events_starts_at"))
         batch_op.drop_index(batch_op.f("ix_pe_meal_events_name"))
@@ -947,31 +722,6 @@ def downgrade():
         batch_op.drop_index(batch_op.f("ix_pe_meal_events_cook_person_id"))
 
     op.drop_table("pe_meal_events")
-    with op.batch_alter_table("pe_food_packagings", schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_unit_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_product_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_household_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_group_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_food_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_food_packagings_created_at"))
-
-    op.drop_table("pe_food_packagings")
-    with op.batch_alter_table("pe_products", schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f("ix_pe_products_name"))
-        batch_op.drop_index(batch_op.f("ix_pe_products_group_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_products_food_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_products_created_at"))
-        batch_op.drop_index(batch_op.f("ix_pe_products_barcode"))
-
-    op.drop_table("pe_products")
-    with op.batch_alter_table("pe_persons", schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f("ix_pe_persons_linked_user_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_persons_household_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_persons_group_id"))
-        batch_op.drop_index(batch_op.f("ix_pe_persons_display_name"))
-        batch_op.drop_index(batch_op.f("ix_pe_persons_created_at"))
-
-    op.drop_table("pe_persons")
     with op.batch_alter_table("pe_food_restriction_status", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_pe_food_restriction_status_verified_by"))
         batch_op.drop_index(batch_op.f("ix_pe_food_restriction_status_restriction_id"))
@@ -987,6 +737,14 @@ def downgrade():
         batch_op.drop_index(batch_op.f("ix_pe_tool_restriction_status_created_at"))
 
     op.drop_table("pe_tool_restriction_status")
+    with op.batch_alter_table("pe_persons", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_pe_persons_linked_user_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_persons_household_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_persons_group_id"))
+        batch_op.drop_index(batch_op.f("ix_pe_persons_display_name"))
+        batch_op.drop_index(batch_op.f("ix_pe_persons_created_at"))
+
+    op.drop_table("pe_persons")
     with op.batch_alter_table("pe_inspirations", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_pe_inspirations_title"))
         batch_op.drop_index(batch_op.f("ix_pe_inspirations_status"))

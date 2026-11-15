@@ -44,17 +44,17 @@ class PeFoodRestrictionStatus(PersonalGroupScoped, SqlAlchemyBase, BaseMixins):
     )
 
     food_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("ingredient_foods.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("ingredient_foods.id", ondelete="CASCADE"), nullable=False, index=True
     )
     restriction_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_dietary_restrictions.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_dietary_restrictions.id", ondelete="CASCADE"), nullable=False, index=True
     )
     restriction: Mapped[PeDietaryRestriction] = orm.relationship(PeDietaryRestriction, lazy="joined")
 
     status: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
     source: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
     reason: FilterableColumn[str | None] = mapped_column(sa.String)
-    verified_by: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("users.id"), index=True)
+    verified_by: FilterableColumn[GUID | None] = mapped_column(GUID, index=True)
     verified_at: FilterableColumn[datetime | None] = mapped_column(NaiveDateTime)
 
     @auto_init()
@@ -70,9 +70,11 @@ class PeToolRestrictionStatus(PersonalGroupScoped, SqlAlchemyBase, BaseMixins):
         sa.UniqueConstraint("tool_id", "restriction_id", name="pe_tool_restriction_status_tool_restriction_key"),
     )
 
-    tool_id: FilterableColumn[GUID] = mapped_column(GUID, sa.ForeignKey("tools.id"), nullable=False, index=True)
+    tool_id: FilterableColumn[GUID] = mapped_column(
+        GUID, sa.ForeignKey("tools.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     restriction_id: FilterableColumn[GUID] = mapped_column(
-        GUID, sa.ForeignKey("pe_dietary_restrictions.id"), nullable=False, index=True
+        GUID, sa.ForeignKey("pe_dietary_restrictions.id", ondelete="CASCADE"), nullable=False, index=True
     )
     restriction: Mapped[PeDietaryRestriction] = orm.relationship(PeDietaryRestriction, lazy="joined")
 

@@ -37,6 +37,9 @@ def test_personal_data_survives_a_native_backup_and_restore(api_client: TestClie
     ).json()
     api_client.post(f"{BASE}/inspirations/{inspiration['id']}/draft", headers=unique_user.token)
 
+    # A restore drops every table. PostgreSQL makes that wait for any open transaction, so end ours first.
+    unique_user.repos.session.rollback()
+
     backup = BackupV2(get_app_settings().DB_URL)
     path = backup.backup()
     backup.restore(path)
