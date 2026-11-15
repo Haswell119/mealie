@@ -5,8 +5,13 @@ import type {
   AssistantChatRequest,
   AssistantChatResponse,
   AssistantStatus,
+  BudgetSettingsOut,
+  BudgetSettingsUpdate,
+  BudgetSummaryOut,
   DietaryRestrictionCreate,
   DietaryRestrictionOut,
+  ExpenseCreate,
+  ExpenseOut,
   FoodBulkVerify,
   FoodComplianceOut,
   FoodPackagingCreate,
@@ -21,6 +26,7 @@ import type {
   InspirationCreate,
   InspirationOut,
   InspirationUpdate,
+  MealCostsOut,
   MealEventAnalysisOut,
   MealEventAssignmentSet,
   MealEventCreate,
@@ -36,6 +42,7 @@ import type {
   PersonCreate,
   PersonOut,
   PlanBudgetOut,
+  PlanExpenseCreate,
   PriceOfferSearchOut,
   PriceRefreshOut,
   PriceSourceStatus,
@@ -45,6 +52,7 @@ import type {
   ProductSearchOut,
   RecipeComplianceOut,
   RecipeCostOut,
+  RecipeCostsOut,
   RetailStore,
   ShoppingPlanApply,
   ShoppingPlanApplyOut,
@@ -53,6 +61,8 @@ import type {
   ShoppingPlanLineOut,
   ShoppingPlanOut,
   ShoppingPlanPreviewOut,
+  StoreMatchOut,
+  StoreMatchRequest,
   ToolRestrictionStatusCreate,
   ToolRestrictionStatusOut,
 } from "~/lib/api/types/personal";
@@ -178,6 +188,15 @@ export class ShoppingPlansApi extends BaseCRUDAPI<ShoppingPlanCreate, ShoppingPl
   async getBudget(id: string) {
     return await this.requests.get<PlanBudgetOut>(`${this.itemRoute(id)}/budget`);
   }
+
+  /** Search the shops for the products of the lines of the plan. Nothing is stored. */
+  async matchStores(id: string, payload: StoreMatchRequest = {}) {
+    return await this.requests.post<StoreMatchOut>(`${this.itemRoute(id)}/store-match`, payload);
+  }
+
+  async recordExpense(id: string, payload: PlanExpenseCreate) {
+    return await this.requests.post<ExpenseOut>(`${this.itemRoute(id)}/expense`, payload);
+  }
 }
 
 export class PantryApi extends BaseCRUDAPI<PantryItemCreate, PantryItemOut> {
@@ -241,6 +260,35 @@ export class PricesApi extends BaseCRUDAPI<FoodPriceCreate, FoodPriceOut> {
 
   async getRecipeCost(recipeId: string) {
     return await this.requests.get<RecipeCostOut>(`${prefix}/prices/recipes/${recipeId}`);
+  }
+
+  async saveMany(payload: FoodPriceCreate[]) {
+    return await this.requests.post<FoodPriceOut[]>(`${prefix}/prices/bulk`, payload);
+  }
+}
+
+export class BudgetApi extends BaseCRUDAPI<ExpenseCreate, ExpenseOut> {
+  constructor(requests: ApiRequestInstance) {
+    super(requests, `${prefix}/budget/expenses`, id => `${prefix}/budget/expenses/${id}`);
+  }
+
+  async getSummary(months = 12) {
+    return await this.requests.get<BudgetSummaryOut>(route(`${prefix}/budget/summary`, { months }));
+  }
+
+  async setSettings(payload: BudgetSettingsUpdate) {
+    return await this.requests.put<BudgetSettingsOut>(`${prefix}/budget/settings`, payload);
+  }
+
+  /** The cost of the meals of the meal plan. An empty shop takes the cheapest price of each food. */
+  async getMealCosts(dateFrom: string, dateTo: string, store?: string | null) {
+    const query = store === undefined || store === null ? { dateFrom, dateTo } : { dateFrom, dateTo, store };
+    return await this.requests.get<MealCostsOut>(route(`${prefix}/budget/meals`, query));
+  }
+
+  async getRecipeCosts(store?: string | null) {
+    const query = store === undefined || store === null ? {} : { store };
+    return await this.requests.get<RecipeCostsOut>(route(`${prefix}/budget/recipes`, query));
   }
 }
 
@@ -337,6 +385,7 @@ export class PersonalApi {
   public packagings: PackagingsApi;
   public products: ProductsApi;
   public prices: PricesApi;
+  public budget: BudgetApi;
   public ideas: IdeasApi;
   public inspirations: InspirationsApi;
   public assistant: AssistantApi;
@@ -350,6 +399,7 @@ export class PersonalApi {
     this.packagings = new PackagingsApi(requests);
     this.products = new ProductsApi(requests);
     this.prices = new PricesApi(requests);
+    this.budget = new BudgetApi(requests);
     this.ideas = new IdeasApi(requests);
     this.inspirations = new InspirationsApi(requests);
     this.assistant = new AssistantApi(requests);

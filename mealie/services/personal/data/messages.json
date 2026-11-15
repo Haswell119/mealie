@@ -35,12 +35,18 @@
       "ASSISTANT_UNAVAILABLE": "L'assistant n'est pas disponible. Rédigez le brouillon à la main.",
       "PRICE_ABOVE_REGULAR": "Le prix normal ne peut pas être inférieur au prix.",
       "PRICE_EXISTS": "Cet aliment a déjà un prix dans ce magasin.",
+      "TOO_MANY_PRICES": "Trop de prix dans une seule demande.",
+      "EXPENSE_IN_FUTURE": "Une dépense ne peut pas être dans le futur.",
+      "EXPENSE_AMOUNT_REQUIRED": "Indiquez le montant payé.",
+      "DATE_RANGE_INVALID": "La date de fin est avant la date de début.",
+      "DATE_RANGE_TOO_LONG": "La période est trop longue.",
       "IDEAS_UNAVAILABLE": "L'assistant n'est pas disponible. Le fil d'idées continue de fonctionner sans lui."
     },
     "not_found": {
       "Not found.": "Introuvable.",
       "Person not found.": "Personne introuvable.",
       "Food not found.": "Aliment introuvable.",
+      "Expense not found.": "Dépense introuvable.",
       "Unit not found.": "Unité introuvable.",
       "Tool not found.": "Ustensile introuvable.",
       "Tool flag not found.": "Signalement d'ustensile introuvable.",

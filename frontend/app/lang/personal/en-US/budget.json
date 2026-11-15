@@ -1,0 +1,94 @@
+{
+  "title": "Budget",
+  "subtitle": "Your shopping expenses month after month, and the cost of your meals.",
+  "month": {
+    "title": "This month",
+    "spent": "spent",
+    "target": "Target: {amount}",
+    "remaining": "{amount} left",
+    "over": "Target passed by {amount}",
+    "no-target": "No target set for the month.",
+    "average": "Mean of the months before: {amount}",
+    "count": "{count} visit to a shop | {count} visits to a shop"
+  },
+  "settings": {
+    "button": "Target and shop",
+    "title": "Target and usual shop",
+    "target": "Target for each month (CHF)",
+    "target-hint": "Leave empty to set no target.",
+    "target-invalid": "The target must be more than zero.",
+    "store": "Usual shop",
+    "store-hint": "Its prices give the cost of the meals. Empty: the lowest price of each food."
+  },
+  "chart": {
+    "title": "Expenses by month",
+    "empty": "No expense in this period.",
+    "bar": "{month}: {amount}",
+    "target-line": "Target"
+  },
+  "stores": {
+    "title": "By shop",
+    "period": "In the last {months} months",
+    "visits": "{count} time | {count} times"
+  },
+  "check": "For {count} shopping plan, the application estimated {estimated} and you paid {paid}. | For {count} shopping plans, the application estimated {estimated} and you paid {paid}.",
+  "expenses": {
+    "title": "Expenses",
+    "add": "Add an expense",
+    "edit": "Edit the expense",
+    "empty": "No expense yet. In a shopping plan, \"I did this shopping\" stores one.",
+    "date": "Date",
+    "store": "Shop",
+    "store-hint": "Choose a shop or type another name, for example \"market\".",
+    "amount": "Amount paid (CHF)",
+    "amount-invalid": "The amount must be more than zero.",
+    "note": "Note",
+    "estimated": "estimated {amount}",
+    "plan": "Plan: {name}",
+    "delete-confirm": "Delete the expense of {amount} at {store}?",
+    "more": "Show more"
+  },
+  "record": {
+    "title": "I did this shopping",
+    "help": "The expense goes into your budget. Replace the estimate with the amount of the receipt if you have it.",
+    "estimate": "Estimate for {store}: {amount}",
+    "no-estimate": "No estimate for this shop: type the amount that you paid.",
+    "save": "Store the expense",
+    "saved": "Expense of {amount} stored.",
+    "existing": "Already stored for this plan: {amount} at {store}, on {date}.",
+    "open-budget": "See the budget"
+  },
+  "meals": {
+    "title": "Cost of the meals",
+    "help": "The cost of the quantities that each meal uses, without the rest of the packs.",
+    "week": "From {from} to {to}",
+    "previous": "Week before",
+    "next": "Next week",
+    "empty": "No meal planned this week.",
+    "empty-cta": "Plan meals",
+    "total": "Total of the week",
+    "per-serving": "{amount} for each serving",
+    "servings": "{count} serving | {count} servings",
+    "no-cost": "Not enough prices",
+    "partial": "{priced} ingredient of {total} has a price | {priced} ingredients of {total} have a price",
+    "prices-of": "Prices used",
+    "cheapest": "The cheapest of each food",
+    "types": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "side": "Side",
+      "snack": "Snack",
+      "drink": "Drink",
+      "dessert": "Dessert"
+    }
+  },
+  "recipes": {
+    "title": "Cost of the recipes",
+    "help": "The cheapest serving first. A recipe appears when half of its ingredients have a price.",
+    "empty": "No recipe has enough prices yet. In a shopping plan, search the products in the shops to get them.",
+    "counted": "{priced} recipe of {total} has a cost | {priced} recipes of {total} have a cost",
+    "show-all": "Show all",
+    "total": "{amount} for the recipe"
+  }
+}

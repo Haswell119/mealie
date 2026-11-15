@@ -42,6 +42,11 @@ class PriceController(BaseUserController):
         """Keep the price of a food in a shop. The food has one price for each shop: a new one replaces it."""
         return run(lambda: self.service.save(data))
 
+    @router.post("/bulk", response_model=list[FoodPriceOut], status_code=201)
+    def save_many(self, data: list[FoodPriceCreate]):
+        """Keep several prices at once: the products chosen for the lines of a shopping plan."""
+        return run(lambda: self.service.save_many(data))
+
     @router.get("/status", response_model=PriceSourceStatus)
     def get_status(self):
         return self.service.status()

@@ -50,6 +50,13 @@ def test_personal_data_survives_a_native_backup_and_restore(api_client: TestClie
         promotionEndsOn="2031-07-01",
     )
 
+    expense = api_client.post(
+        f"{BASE}/budget/expenses",
+        json={"spentOn": "2026-03-14", "store": "migros", "amount": 84.5, "planId": plan["id"]},
+        headers=unique_user.token,
+    ).json()
+    api_client.put(f"{BASE}/budget/settings", json={"monthlyTarget": 600}, headers=unique_user.token)
+
     # A restore drops every table. PostgreSQL makes that wait for any open transaction, so end ours first.
     unique_user.repos.session.rollback()
 
@@ -85,6 +92,11 @@ def test_personal_data_survives_a_native_backup_and_restore(api_client: TestClie
     assert (restored_price.store, restored_price.price, restored_price.size) == ("migros", 2.4, 500)
     assert restored_price.promotion_ends_on == date(2031, 7, 1)
     assert isinstance(restored_price.fetched_at, datetime)
+
+    restored_expense = restored.pe_expenses.get_one(expense["id"])
+    assert (restored_expense.spent_on, restored_expense.amount) == (date(2026, 3, 14), 84.5)
+    assert str(restored_expense.plan_id) == plan["id"]
+    assert restored.pe_budget_settings.get_all()[0].monthly_target == 600
 
     status = restored.pe_food_restriction_status.multi_query({"food_id": food.id})[0]
     assert status.status == "VERIFIED"

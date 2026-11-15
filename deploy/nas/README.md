@@ -138,9 +138,12 @@ en-têtes `Host`, `X-Forwarded-For` et `X-Forwarded-Proto`.
    personne cuisine ».
 2. **Vérifications** → marquer « vérifié » les aliments dont vous avez lu l'étiquette.
 3. **Stocks** → saisir le stock, les tailles de paquets et, dans l'onglet **Prix**, ce que vous
-   payez pour les aliments que vous achetez souvent. Le budget s'affiche alors dans chaque plan de
-   courses, et le coût par portion dans la page **Idées**.
-4. **Assistant IA** (facultatif) → voir `docs/personal-edition/infomaniak.md`.
+   payez pour les aliments que vous achetez souvent. Chaque plan de courses compare alors les
+   magasins sur le **panier entier**, et la page **Idées** donne le coût par portion.
+4. **Budget** → après les courses, « J'ai fait ces courses » dans le plan enregistre le montant
+   payé. La page **Budget** montre les dépenses par mois et par magasin, l'objectif du mois, et
+   le coût des repas planifiés et des recettes.
+5. **Assistant IA** (facultatif) → voir `docs/personal-edition/infomaniak.md`.
 
 ## Prix des magasins (facultatif)
 
@@ -177,6 +180,20 @@ Vérifier que le service répond, puis chercher un produit dans **Stocks → Pri
 ```bash
 docker compose exec price-bridge wget -q -O - http://127.0.0.1:8080/health
 ```
+
+Dans un plan de courses, le bouton **Chercher les produits en magasin** propose alors, pour
+chaque article et chaque enseigne, les produits qui correspondent. Vous choisissez ; rien n'est
+gardé avant. À savoir :
+
+- les enseignes nomment leurs produits en allemand : l'application traduit l'aliment (liste
+  `mealie/services/personal/data/store_terms.json`) et vous pouvez chercher avec un autre texte ;
+- un produit n'est présélectionné que si son nom désigne bien l'aliment. Pour un aliment « sans
+  gluten », un produit qui ne porte pas cette mention n'est jamais proposé ;
+- **un prix ne vérifie rien** : le produit proposé n'est pas contrôlé pour vos restrictions.
+  Lisez l'étiquette ;
+- les montants sont approximatifs : un article compté à la pièce est estimé avec un poids
+  usuel, et un article sans prix dans un magasin y est compté au prix moyen des autres. Un
+  magasin qui a un prix pour moins de la moitié des articles n'est pas comparé.
 
 Pour l'éteindre : retirer les deux lignes de `.env`, puis
 

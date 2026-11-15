@@ -27,17 +27,20 @@ from .engine.pricing import (
     Cost,
     PricePoint,
     cheapest_used,
+    compare_baskets,
     costs_of,
     money,
     price_point,
 )
 from .engine.requirements import Need
+from .engine.store_match import piece_grams
 from .engine.units import UnitInfo, to_decimal
 from .errors import PersonalError, PersonalNotFound
 from .price_source import PriceSource, PriceSourceUnavailable
 from .recipe_needs import RecipeReader, unit_info
 
 BEST_STORE = "*"
+MAX_BULK_PRICES = 400
 
 
 class PriceService:
@@ -85,6 +88,12 @@ class PriceService:
             if other.id != current.id:
                 raise PersonalError("PRICE_EXISTS", "This food already has a price in this shop.")
         return self.prices.update(price_id, save)
+
+    def save_many(self, items: list[FoodPriceCreate]) -> list[FoodPriceOut]:
+        """Keep several prices at once: the products that the person chose for a shopping plan."""
+        if len(items) > MAX_BULK_PRICES:
+            raise PersonalError("TOO_MANY_PRICES", "Too many prices in one request.")
+        return [self.save(item) for item in items]
 
     def delete(self, price_id: UUID4) -> FoodPriceOut:
         price = self.get_one(price_id)
@@ -160,11 +169,13 @@ class PriceService:
             self._units[unit_id] = unit_info(self.repos.ingredient_units.get_one(unit_id))
         return self._units[unit_id]
 
-    def price_points(self, today: date | None = None) -> dict[UUID4, list[PricePoint]]:
-        """The prices of the household, by food."""
+    def price_points(self, today: date | None = None, store: str | None = None) -> dict[UUID4, list[PricePoint]]:
+        """The prices of the household, by food. `store` keeps the prices of one shop."""
         today = today or datetime.now(UTC).date()
         points: dict[UUID4, list[PricePoint]] = {}
         for stored in self.prices.get_all():
+            if store is not None and stored.store != store:
+                continue
             points.setdefault(stored.food_id, []).append(
                 price_point(
                     stored.store,
@@ -185,8 +196,9 @@ class PriceService:
         """
         What the lines of a shopping plan cost, shop by shop.
 
-        The total of a shop covers the lines that the shop has a price for; `missing_lines` says how many it
-        leaves out. Nothing is written.
+        A person shops in one shop, so the shops are compared on the whole shopping: `basket_total` adds, to
+        the lines that the shop has a price for, an estimate of the lines that it has no price for. The first
+        shop of `stores` is the cheapest for the whole shopping. Nothing is written.
         """
         from .shopping_plan_service import ShoppingPlanService  # the plan service is the heavier module
 
@@ -198,6 +210,7 @@ class PriceService:
         best = BudgetTotal(store=BEST_STORE)
         best_total, best_used = Decimal("0"), Decimal("0")
         sums: dict[str, tuple[Decimal, Decimal]] = {}
+        line_costs: list[dict[str, Decimal]] = []
 
         to_buy = [line for line in preview.lines if line.quantity_to_buy > 0]
         out.line_count = len(to_buy)
@@ -217,10 +230,18 @@ class PriceService:
             elif line.food_id not in points:
                 budget_line.reason = REASON_NO_PRICE
             else:
-                costs = costs_of(to_decimal(line.quantity_to_buy), self._unit(line.unit_id), points[line.food_id])
+                # At the till a line costs at least one pack, so a quantity that no pack can measure takes one.
+                costs = costs_of(
+                    to_decimal(line.quantity_to_buy),
+                    self._unit(line.unit_id),
+                    points[line.food_id],
+                    piece_size=piece_grams(line.food_name),
+                    assume_pack=True,
+                )
                 if not costs:
                     budget_line.reason = REASON_UNIT_MISMATCH
 
+            line_costs.append({cost.store: cost.cost for cost in costs})
             for cost in costs:
                 budget_line.offers.append(_offer(cost))
                 total = totals.setdefault(cost.store, BudgetTotal(store=cost.store))
@@ -241,7 +262,16 @@ class PriceService:
             total.total, total.used_total = float(paid), float(used)
             total.missing_lines = out.line_count - total.priced_lines
 
-        out.stores = sorted(totals.values(), key=lambda total: (total.missing_lines, total.total, total.store))
+        baskets = compare_baskets(line_costs)
+        for basket in baskets:
+            total = totals[basket.store]
+            total.estimated_missing = float(basket.estimated)
+            total.basket_total = float(basket.basket)
+            total.comparable = basket.comparable
+        out.stores = [totals[basket.store] for basket in baskets]
+        out.unpriced_lines = sum(1 for costs_by_store in line_costs if not costs_by_store)
+        if baskets and baskets[0].comparable:
+            out.recommended_store = baskets[0].store
         if best.priced_lines:
             best.total, best.used_total = float(best_total), float(best_used)
             best.missing_lines = out.line_count - best.priced_lines
@@ -273,6 +303,7 @@ def _offer(cost: Cost) -> BudgetOffer:
         packs=cost.packs,
         label=cost.label,
         on_promotion=cost.on_promotion,
+        approximate=cost.approximate,
     )
 
 
@@ -298,13 +329,13 @@ def cost_needs(needs: list[Need], points: dict[UUID4, list[PricePoint]]) -> Reci
         if need.food_id not in points:
             entry.reason = REASON_NO_PRICE
             continue
-        cost = cheapest_used(need.quantity, need.unit, points[need.food_id])
+        cost = cheapest_used(need.quantity, need.unit, points[need.food_id], piece_size=piece_grams(need.food_name))
         if cost is None:
             entry.reason = REASON_UNIT_MISMATCH
             continue
 
         out.priced_ingredients += 1
-        entry.cost, entry.store = float(cost.used_cost), cost.store
+        entry.cost, entry.store, entry.approximate = float(cost.used_cost), cost.store, cost.approximate
         total += cost.used_cost
 
     out.total = float(money(total))

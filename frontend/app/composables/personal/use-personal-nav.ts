@@ -1,6 +1,7 @@
 import {
   mdiAccountGroup,
   mdiCartArrowDown,
+  mdiCashMultiple,
   mdiCompassOutline,
   mdiFridgeOutline,
   mdiHomeVariantOutline,
@@ -18,6 +19,7 @@ export const personalIcons = {
   events: mdiPartyPopper,
   pantry: mdiFridgeOutline,
   shopping: mdiCartArrowDown,
+  budget: mdiCashMultiple,
   inspirations: mdiLightbulbOnOutline,
   ideas: mdiCompassOutline,
   assistant: mdiRobotOutline,
@@ -45,6 +47,7 @@ export function usePersonalSidebarLinks() {
     { icon: personalIcons.ideas, to: "/ideas", title: i18n.t("personal.nav.ideas"), restricted: true },
     { icon: personalIcons.shopping, to: "/shopping-plans", title: i18n.t("personal.nav.shopping-plans"), restricted: true },
     { icon: personalIcons.pantry, to: "/pantry", title: i18n.t("personal.nav.pantry"), restricted: true },
+    { icon: personalIcons.budget, to: "/budget", title: i18n.t("personal.nav.budget"), restricted: true },
     { icon: personalIcons.events, to: "/events", title: i18n.t("personal.nav.events"), restricted: true },
     { icon: personalIcons.people, to: "/people", title: i18n.t("personal.nav.people"), restricted: true },
     { icon: personalIcons.dietary, to: "/dietary", title: i18n.t("personal.nav.dietary"), restricted: true },

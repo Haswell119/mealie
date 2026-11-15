@@ -255,7 +255,7 @@ def test_budget_of_a_shopping_plan(api_client: TestClient, unique_user: TestUser
     save_price(api_client, unique_user, pasta, "coop", 2.6, size=1, sizeUnit="kg", regularPrice=3.2, promotion="-20%")
     # tomatoes by weight at Migros only
     save_price(api_client, unique_user, tomato, "migros", 3.5, size=1, sizeUnit="kg", byWeight=True)
-    # onions priced by the kilogram cannot price "4 onions"
+    # onions priced by the kilogram cannot measure "4 onions": the shopping takes one pack of them
     save_price(api_client, unique_user, onion, "migros", 2.2, size=1, sizeUnit="kg")
 
     response = api_client.get(f"{PLANS}/{plan['id']}/budget", headers=unique_user.token)
@@ -273,28 +273,46 @@ def test_budget_of_a_shopping_plan(api_client: TestClient, unique_user: TestUser
     ]
     assert pasta_line["offers"][1]["onPromotion"] is True
     assert by_food[str(tomato.id)]["offers"] == [
-        {"store": "migros", "cost": 4.2, "usedCost": 4.2, "packs": None, "label": None, "onPromotion": False}
+        {
+            "store": "migros",
+            "cost": 4.2,
+            "usedCost": 4.2,
+            "packs": None,
+            "label": None,
+            "onPromotion": False,
+            "approximate": False,
+        }
     ]
-    assert by_food[str(onion.id)]["reason"] == "UNIT_MISMATCH"
+    onion_line = by_food[str(onion.id)]
+    assert onion_line["reason"] is None
+    assert [(offer["cost"], offer["packs"], offer["approximate"]) for offer in onion_line["offers"]] == [(2.2, 1, True)]
     assert by_food[str(basil.id)]["reason"] == "NO_PRICE"
     assert lines["sel"]["reason"] == "NO_FOOD"
 
-    # Migros prices two lines, Coop one: the shop that covers more lines comes first
+    # Migros prices three lines, Coop one
     assert [
         (total["store"], total["total"], total["pricedLines"], total["missingLines"]) for total in budget["stores"]
     ] == [
-        ("migros", 6.6, 2, 3),
+        ("migros", 8.8, 3, 2),
         ("coop", 2.6, 1, 4),
     ]
     assert budget["stores"][1]["promotions"] == 1
-    assert (budget["best"]["store"], budget["best"]["total"], budget["best"]["pricedLines"]) == ("*", 6.6, 2)
+    assert (budget["best"]["store"], budget["best"]["total"], budget["best"]["pricedLines"]) == ("*", 8.8, 3)
+
+    # the shops are compared on the whole shopping: Coop counts the tomatoes and the onions at the price of Migros
+    migros, coop = budget["stores"]
+    assert (migros["basketTotal"], migros["estimatedMissing"], migros["comparable"]) == (8.8, 0, True)
+    assert (coop["basketTotal"], coop["estimatedMissing"], coop["comparable"]) == (9.0, 6.4, False)
+    assert budget["recommendedStore"] == "migros"
+    # the basil and the salt have no price in any shop: they are in no total
+    assert budget["unpricedLines"] == 2
 
     # what is in stock is not bought, so it is not in the budget
     add_stock(api_client, unique_user, pasta, 800, gram)
     budget = api_client.get(f"{PLANS}/{plan['id']}/budget", headers=unique_user.token).json()
     assert budget["lineCount"] == 4
     assert str(pasta.id) not in [line["foodId"] for line in budget["lines"]]
-    assert [(total["store"], total["total"]) for total in budget["stores"]] == [("migros", 4.2)]
+    assert [(total["store"], total["total"]) for total in budget["stores"]] == [("migros", 6.4)]
 
     assert api_client.get(f"{PLANS}/{plan['id']}/budget", headers=unique_user.token).status_code == 200
     missing = api_client.get(f"{PLANS}/00000000-0000-4000-8000-000000000000/budget", headers=unique_user.token)

@@ -5,6 +5,7 @@ from uuid import uuid4
 from mealie.services.personal.engine.pricing import (
     PricePoint,
     cheapest_used,
+    compare_baskets,
     cost_of,
     costs_of,
     price_point,
@@ -202,3 +203,60 @@ def test_the_price_source_is_off_without_an_address(monkeypatch):
     assert PriceSource().enabled is False
     assert PriceSource("file:///etc/passwd").enabled is False
     assert PriceSource("http://price-bridge:8080/").base_url == "http://price-bridge:8080"
+
+
+def test_a_usual_weight_prices_pieces_against_a_pack_by_weight():
+    onions = point("migros", "2.20", "1", "kg")
+
+    # the engine guesses nothing by itself
+    assert cost_of(Decimal("4"), None, onions) is None
+
+    # 4 onions of 150 g are 600 g: one pack, and the recipe uses 60 % of it
+    cost = cost_of(Decimal("4"), None, onions, piece_size=Decimal("150"))
+    assert cost is not None
+    assert (cost.cost, cost.used_cost, cost.packs, cost.approximate) == (Decimal("2.20"), Decimal("1.32"), 1, True)
+
+    # a usual weight says nothing about a volume, and nothing about a unit such as a pinch
+    assert cost_of(Decimal("4"), None, point("coop", "1.80", "1", "l"), piece_size=Decimal("150")) is None
+    assert cost_of(Decimal("1"), PINCH, onions, piece_size=Decimal("150")) is None
+
+    # a quantity that the pack measures is exact, with or without the assumptions
+    exact = cost_of(Decimal("600"), GRAM, onions, piece_size=Decimal("150"), assume_pack=True)
+    assert exact is not None and exact.approximate is False
+
+
+def test_the_shopping_takes_one_pack_when_nothing_measures_the_quantity():
+    parsley = point("migros", "1.50", "30", "g")
+
+    cost = cost_of(Decimal("2"), PINCH, parsley, assume_pack=True)
+    assert cost is not None
+    assert (cost.cost, cost.used_cost, cost.packs, cost.approximate) == (Decimal("1.50"), Decimal("1.50"), 1, True)
+
+    # the share of a pack that a recipe uses is never assumed
+    assert cheapest_used(Decimal("2"), PINCH, [parsley]) is None
+    assert costs_of(Decimal("2"), PINCH, [parsley]) == []
+
+
+def test_the_shops_are_compared_on_the_whole_shopping():
+    lines = [
+        {"migros": Decimal("2.00"), "coop": Decimal("3.00")},
+        {"migros": Decimal("9.00"), "coop": Decimal("5.00")},
+        {"migros": Decimal("4.00"), "coop": Decimal("4.50"), "lidl": Decimal("1.00")},
+        {},
+    ]
+
+    baskets = compare_baskets(lines)
+    # Migros is cheaper on two lines of three, and Coop is cheaper for the whole shopping
+    assert [(basket.store, basket.basket, basket.comparable) for basket in baskets] == [
+        ("coop", Decimal("12.50"), True),
+        ("migros", Decimal("15.00"), True),
+        ("lidl", Decimal("10.50"), False),
+    ]
+
+    # Lidl has one price of three: the two other lines count at the mean of Migros and Coop
+    lidl = baskets[-1]
+    assert (lidl.total, lidl.estimated, lidl.priced, lidl.missing) == (Decimal("1.00"), Decimal("9.50"), 1, 2)
+
+    # a line that no shop prices is in no total, and no shop means no basket
+    assert all(basket.priced + basket.missing == 3 for basket in baskets)
+    assert compare_baskets([{}, {}]) == []

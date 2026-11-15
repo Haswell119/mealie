@@ -30,6 +30,44 @@ def unit_info(unit) -> UnitInfo | None:
     )
 
 
+def needs_from_rows(
+    recipe_id: UUID4,
+    recipe_name: str,
+    rows: dict[UUID4, list],
+    units: dict[UUID4, UnitInfo | None],
+    scale: Decimal = Decimal("1"),
+    _depth: int = 0,
+) -> list[Need]:
+    """
+    The quantities that a recipe needs, from the light ingredient rows of `pe_recipe_ingredient_rows`.
+
+    It reads a recipe as `RecipeReader.needs` does, sub-recipes included, without loading the whole recipe:
+    a page that prices every recipe at once uses it.
+    """
+    needs: list[Need] = []
+    for row in rows.get(recipe_id, []):
+        if row.referenced_recipe_id is not None:
+            if _depth < MAX_RECIPE_DEPTH:
+                sub_scale = to_decimal(row.quantity or 1) * scale
+                needs.extend(needs_from_rows(row.referenced_recipe_id, recipe_name, rows, units, sub_scale, _depth + 1))
+            continue
+        note = (row.note or "").strip() or None
+        if row.food_id is None and note is None:
+            continue
+        base_quantity = to_decimal(row.quantity or 0)
+        needs.append(
+            Need(
+                quantity=base_quantity * scale,
+                source=NeedSource(recipe_id, recipe_name, scale, base_quantity),
+                food_id=row.food_id,
+                food_name=row.food_name,
+                unit=units.get(row.unit_id) if row.unit_id is not None else None,
+                note=note,
+            )
+        )
+    return needs
+
+
 class RecipeReader:
     """Loads recipes of the group and flattens them, sub-recipes included."""
 

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from . import (
     controller_assistant,
+    controller_budget,
     controller_dietary,
     controller_ideas,
     controller_inspirations,
@@ -25,6 +26,8 @@ router.include_router(controller_pantry.packaging_router)
 router.include_router(controller_products.router)
 router.include_router(controller_prices.router)
 router.include_router(controller_prices.budget_router)
+router.include_router(controller_budget.router)
+router.include_router(controller_budget.plan_router)
 router.include_router(controller_inspirations.router)
 router.include_router(controller_ideas.router)
 router.include_router(controller_assistant.router)

@@ -1,0 +1,94 @@
+{
+  "title": "Budget",
+  "subtitle": "Vos dépenses de courses mois après mois, et le coût de vos repas.",
+  "month": {
+    "title": "Ce mois-ci",
+    "spent": "dépensés",
+    "target": "Objectif : {amount}",
+    "remaining": "Il reste {amount}",
+    "over": "Objectif dépassé de {amount}",
+    "no-target": "Aucun objectif fixé pour le mois.",
+    "average": "Moyenne des mois précédents : {amount}",
+    "count": "{count} passage en magasin | {count} passages en magasin"
+  },
+  "settings": {
+    "button": "Objectif et magasin",
+    "title": "Objectif et magasin habituel",
+    "target": "Objectif par mois (CHF)",
+    "target-hint": "Laissez vide pour ne pas fixer d'objectif.",
+    "target-invalid": "L'objectif doit être supérieur à zéro.",
+    "store": "Magasin habituel",
+    "store-hint": "Ses prix donnent le coût des repas. Vide : le prix le plus bas de chaque aliment."
+  },
+  "chart": {
+    "title": "Dépenses par mois",
+    "empty": "Aucune dépense sur cette période.",
+    "bar": "{month} : {amount}",
+    "target-line": "Objectif"
+  },
+  "stores": {
+    "title": "Par magasin",
+    "period": "Sur les {months} derniers mois",
+    "visits": "{count} fois | {count} fois"
+  },
+  "check": "Sur {count} plan de courses, l'application avait estimé {estimated} et vous avez payé {paid}. | Sur {count} plans de courses, l'application avait estimé {estimated} et vous avez payé {paid}.",
+  "expenses": {
+    "title": "Dépenses",
+    "add": "Ajouter une dépense",
+    "edit": "Modifier la dépense",
+    "empty": "Aucune dépense pour l'instant. Dans un plan de courses, « J'ai fait ces courses » en enregistre une.",
+    "date": "Date",
+    "store": "Magasin",
+    "store-hint": "Choisissez un magasin ou saisissez un autre nom, par exemple « marché ».",
+    "amount": "Montant payé (CHF)",
+    "amount-invalid": "Le montant doit être supérieur à zéro.",
+    "note": "Note",
+    "estimated": "estimé {amount}",
+    "plan": "Plan : {name}",
+    "delete-confirm": "Supprimer la dépense de {amount} chez {store} ?",
+    "more": "Voir plus"
+  },
+  "record": {
+    "title": "J'ai fait ces courses",
+    "help": "La dépense s'ajoute à votre budget. Remplacez l'estimation par le montant du ticket si vous l'avez.",
+    "estimate": "Estimation pour {store} : {amount}",
+    "no-estimate": "Aucune estimation pour ce magasin : saisissez le montant payé.",
+    "save": "Enregistrer la dépense",
+    "saved": "Dépense de {amount} enregistrée.",
+    "existing": "Déjà enregistré pour ce plan : {amount} chez {store}, le {date}.",
+    "open-budget": "Voir le budget"
+  },
+  "meals": {
+    "title": "Coût des repas",
+    "help": "Le coût des quantités que chaque repas utilise, sans le reste des paquets.",
+    "week": "Du {from} au {to}",
+    "previous": "Semaine précédente",
+    "next": "Semaine suivante",
+    "empty": "Aucun repas planifié cette semaine.",
+    "empty-cta": "Planifier des repas",
+    "total": "Total de la semaine",
+    "per-serving": "{amount} par portion",
+    "servings": "{count} portion | {count} portions",
+    "no-cost": "Pas assez de prix",
+    "partial": "{priced} ingrédient sur {total} a un prix | {priced} ingrédients sur {total} ont un prix",
+    "prices-of": "Prix utilisés",
+    "cheapest": "Le moins cher de chaque aliment",
+    "types": {
+      "breakfast": "Petit-déjeuner",
+      "lunch": "Déjeuner",
+      "dinner": "Dîner",
+      "side": "Accompagnement",
+      "snack": "Collation",
+      "drink": "Boisson",
+      "dessert": "Dessert"
+    }
+  },
+  "recipes": {
+    "title": "Coût des recettes",
+    "help": "La portion la moins chère d'abord. Une recette apparaît dès que la moitié de ses ingrédients a un prix.",
+    "empty": "Aucune recette n'a encore assez de prix. Dans un plan de courses, cherchez les produits en magasin pour les obtenir.",
+    "counted": "{priced} recette sur {total} a un coût | {priced} recettes sur {total} ont un coût",
+    "show-all": "Tout afficher",
+    "total": "{amount} la recette"
+  }
+}

@@ -140,6 +140,8 @@ class BudgetOffer(MealieOutModel):
     packs: int | None = None
     label: str | None = None
     on_promotion: bool = False
+    approximate: bool = False
+    """The pack does not measure what the line counts: the cost assumes a usual weight, or one pack."""
 
 
 class BudgetLine(MealieOutModel):
@@ -160,6 +162,12 @@ class BudgetTotal(MealieOutModel):
     priced_lines: int = 0
     missing_lines: int = 0
     promotions: int = 0
+    estimated_missing: float = 0
+    """An estimate of the lines that the shop has no price for: the mean of the shops that price them."""
+    basket_total: float = 0
+    """The whole shopping in this shop: `total` and `estimated_missing`. The shops are compared on it."""
+    comparable: bool = True
+    """False when the shop prices less than half of the lines: its basket is mostly an estimate."""
 
 
 class PlanBudgetOut(MealieOutModel):
@@ -168,7 +176,11 @@ class PlanBudgetOut(MealieOutModel):
     line_count: int = 0
     """The lines of the plan with something to buy."""
     stores: list[BudgetTotal] = []
-    """One total for each shop that has at least one price. A total covers only the lines with a price."""
+    """One total for each shop that has at least one price, the cheapest whole shopping first."""
+    recommended_store: str | None = None
+    """The shop where the whole shopping costs the least. None when no shop prices enough lines."""
+    unpriced_lines: int = 0
+    """The lines that no shop has a price for. They are in no total."""
     best: BudgetTotal | None = None
     """The cheapest shop for each line. `store` is "*"."""
     lines: list[BudgetLine] = []
@@ -180,6 +192,7 @@ class RecipeCostIngredient(MealieOutModel):
     cost: float | None = None
     store: str | None = None
     reason: str | None = None
+    approximate: bool = False
 
 
 class RecipeCostOut(MealieOutModel):

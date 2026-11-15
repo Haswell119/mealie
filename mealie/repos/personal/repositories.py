@@ -9,7 +9,9 @@ from mealie.db.models.household.mealplan import GroupMealPlan
 from mealie.db.models.household.preferences import HouseholdPreferencesModel
 from mealie.db.models.personal import (
     PeAiProposal,
+    PeBudgetSetting,
     PeDietaryRestriction,
+    PeExpense,
     PeFoodPackaging,
     PeFoodPrice,
     PeFoodRestrictionStatus,
@@ -41,6 +43,7 @@ from mealie.db.models.recipe.tag import Tag, recipes_to_tags
 from mealie.db.models.recipe.tool import Tool, recipes_to_tools
 from mealie.db.models.users.users import User
 from mealie.schema.personal.assistant import AiProposalOut
+from mealie.schema.personal.budget import BudgetSettingsOut, ExpenseOut
 from mealie.schema.personal.dietary import (
     DietaryRestrictionOut,
     FoodRestrictionStatusOut,
@@ -176,6 +179,17 @@ class PersonalRepositories:
     @cached_property
     def pe_food_prices(self) -> HouseholdRepositoryGeneric[FoodPriceOut, PeFoodPrice]:
         return self._pe_household(PeFoodPrice, FoodPriceOut)
+
+    # ================================================================
+    # Budget
+
+    @cached_property
+    def pe_expenses(self) -> HouseholdRepositoryGeneric[ExpenseOut, PeExpense]:
+        return self._pe_household(PeExpense, ExpenseOut)
+
+    @cached_property
+    def pe_budget_settings(self) -> HouseholdRepositoryGeneric[BudgetSettingsOut, PeBudgetSetting]:
+        return self._pe_household(PeBudgetSetting, BudgetSettingsOut)
 
     # ================================================================
     # Inspirations and assistant

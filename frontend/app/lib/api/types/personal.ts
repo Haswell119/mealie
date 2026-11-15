@@ -123,6 +123,7 @@ export interface BudgetOffer {
   packs: number | null;
   label: string | null;
   onPromotion: boolean;
+  approximate: boolean;
 }
 export interface BudgetTotal {
   store: string;
@@ -131,6 +132,154 @@ export interface BudgetTotal {
   pricedLines: number;
   missingLines: number;
   promotions: number;
+  estimatedMissing: number;
+  basketTotal: number;
+  comparable: boolean;
+}
+export interface BudgetEstimateCheck {
+  count: number;
+  estimated: number;
+  paid: number;
+}
+export interface BudgetMonth {
+  month: string;
+  total: number;
+  count: number;
+  stores: BudgetStoreTotal[];
+}
+export interface BudgetSettingsOut {
+  id: string | null;
+  monthlyTarget: number | null;
+  usualStore: string | null;
+}
+export interface BudgetSettingsUpdate {
+  monthlyTarget?: number | null;
+  usualStore?: string | null;
+}
+export interface BudgetStoreTotal {
+  store: string;
+  total: number;
+  count: number;
+}
+export interface BudgetSummaryOut {
+  currency: string;
+  monthlyTarget: number | null;
+  usualStore: string | null;
+  months: BudgetMonth[];
+  current: BudgetMonth;
+  remaining: number | null;
+  averageMonth: number | null;
+  stores: BudgetStoreTotal[];
+  total: number;
+  expenseCount: number;
+  estimateCheck: BudgetEstimateCheck;
+}
+export interface ExpenseCreate {
+  spentOn: string;
+  store: string;
+  amount: number;
+  estimatedAmount?: number | null;
+  planId?: string | null;
+  note?: string | null;
+}
+export interface ExpenseOut {
+  id: string;
+  groupId: string;
+  householdId: string;
+  spentOn: string;
+  store: string;
+  amount: number;
+  estimatedAmount: number | null;
+  currency: string;
+  planId: string | null;
+  planName: string | null;
+  note: string | null;
+  createdAt: string | null;
+}
+export interface MealCost {
+  date: string;
+  entryType: string;
+  recipeId: string;
+  recipeSlug: string | null;
+  recipeName: string;
+  servings: number;
+  total: number | null;
+  perServing: number | null;
+  pricedIngredients: number;
+  ingredientCount: number;
+}
+export interface MealCostsOut {
+  dateFrom: string;
+  dateTo: string;
+  store: string | null;
+  currency: string;
+  meals: MealCost[];
+  total: number;
+  pricedMeals: number;
+}
+export interface PlanExpenseCreate {
+  store: string;
+  amount?: number | null;
+  spentOn?: string | null;
+  note?: string | null;
+}
+export interface RecipeCostSummary {
+  recipeId: string;
+  recipeSlug: string | null;
+  recipeName: string;
+  servings: number;
+  total: number | null;
+  perServing: number | null;
+  pricedIngredients: number;
+  ingredientCount: number;
+}
+export interface RecipeCostsOut {
+  store: string | null;
+  currency: string;
+  recipes: RecipeCostSummary[];
+  pricedCount: number;
+}
+export interface StoreMatchCandidate {
+  offer: PriceOffer;
+  score: number;
+  confident: boolean;
+  fits: boolean;
+  cost: number | null;
+  packs: number | null;
+}
+export interface StoreMatchLine {
+  key: string;
+  display: string;
+  foodId: string | null;
+  foodName: string | null;
+  quantity: number;
+  unitName: string;
+  query: string;
+  translated: boolean;
+  reason: string | null;
+  stores: StoreMatchStore[];
+}
+export interface StoreMatchOut {
+  planId: string;
+  available: boolean;
+  lines: StoreMatchLine[];
+  searchedLines: number;
+}
+export interface StoreMatchRequest {
+  keys?: string[];
+  queries?: {
+    [k: string]: string;
+  };
+  refresh?: boolean;
+}
+export interface StoreMatchStore {
+  store: string;
+  storedLabel: string | null;
+  storedPrice: number | null;
+  hasStored: boolean;
+  searched: boolean;
+  failed: boolean;
+  candidates: StoreMatchCandidate[];
 }
 export interface ChecklistItemOut {
   code: string;
@@ -765,6 +914,8 @@ export interface PlanBudgetOut {
   currency: string;
   lineCount: number;
   stores: BudgetTotal[];
+  recommendedStore: string | null;
+  unpricedLines: number;
   best: BudgetTotal | null;
   lines: BudgetLine[];
 }
@@ -889,6 +1040,7 @@ export interface RecipeCostIngredient {
   cost: number | null;
   store: string | null;
   reason: string | null;
+  approximate: boolean;
 }
 export interface RecipeCostOut {
   recipeId: string | null;
