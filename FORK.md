@@ -23,7 +23,8 @@ Ce fichier explique comment le fork est construit pour rester facile à mettre �
 | Routes | `mealie/routes/personal/` |
 | Tests | `tests/unit_tests/personal_tests/`, `tests/integration_tests/personal_tests/` |
 | Client API | `frontend/app/lib/api/user/personal.ts` |
-| Pages | `frontend/app/pages/{people,dietary,events,shopping-plans,pantry,inspirations,assistant}/` |
+| Pages | `frontend/app/pages/{hub,people,dietary,events,shopping-plans,pantry,inspirations,assistant}/` |
+| Apparence « verre liquide » | `frontend/app/assets/personal/liquid-glass.css`, chargée par `frontend/app/plugins/personal-theme.client.ts` |
 | Composants et composables | `frontend/app/components/Domain/{Personal,MealEvent,ShoppingPlan,Pantry,Inspiration,Assistant}/`, `frontend/app/composables/personal/` |
 | Textes de l'interface | `frontend/app/lang/personal/<langue>/*.json`, chargés par `frontend/app/plugins/personal-i18n.ts` |
 | Déploiement NAS | `deploy/nas/` |
@@ -40,10 +41,31 @@ quelques lignes.
 | `mealie/services/backups_v2/alchemy_exporter.py` | import, `personal_migrations.upgrade_for_restore(db_dump)` dans `restore`, `register_backup_columns(AlchemyExporter)` en fin de fichier | Recréer les tables `pe_` avant qu'une restauration y remette ses lignes ; restaurer les dates du fork |
 | `mealie/repos/repository_factory.py` | `class AllRepositories(PersonalRepositories)` + import | Exposer les dépôts du fork |
 | `mealie/routes/__init__.py` | import + `router.include_router(personal.router)` | Brancher les routes du fork |
-| `frontend/app/components/Layout/DefaultLayout.vue` | deux composables et deux `...spread` | Entrées de menu |
+| `frontend/app/components/Layout/DefaultLayout.vue` | trois composables, trois `...spread` et `<PersonalBottomNav />` | Entrées de menu, page d'accueil, barre d'onglets sur téléphone |
 
 Fichiers générés propres au fork, à ne pas modifier à la main : `mealie/schema/personal/__init__.py` et
 `frontend/app/lib/api/types/personal.ts`.
+
+## Apparence
+
+Le style « verre liquide » tient dans une seule feuille de style, `liquid-glass.css`. Elle ne modifie
+aucun composant de Mealie : chaque règle est placée sous la classe `pe-glass`, posée sur la page par le
+greffon `personal-theme.client.ts`. Retirer cette classe redonne l'apparence d'origine ; l'interrupteur
+« Effet verre » de la page « Aujourd'hui » fait exactement cela.
+
+- Le flou réel est réservé aux barres, menus et dialogues. Les cartes de contenu sont translucides sans
+  flou, pour que les longues listes restent fluides sur un téléphone.
+- Les réglages système « réduire la transparence » et « réduire les animations » sont respectés.
+- La barre d'onglets flottante s'efface sur les pages natives qui ont déjà une barre en bas d'écran
+  (la liste de courses et son « Ajouter un article »).
+
+Après une mise à jour amont de Vuetify, vérifier visuellement les pages natives : la feuille cible des
+classes de Vuetify (`.v-card`, `.v-app-bar`, `.v-navigation-drawer`, `.v-dialog`, `.v-menu`, `.v-btn`).
+
+## Branches
+
+`mealie-next` est la branche principale du fork et contient le fork. Le travail se fait sur une branche
+dédiée, fusionnée dans `mealie-next` une fois les contrôles passés.
 
 ## Mettre à jour depuis l'amont
 

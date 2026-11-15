@@ -1,5 +1,5 @@
 <template>
-  <v-container class="narrow-container">
+  <v-container class="narrow-container pe-page">
     <BaseDialog
       v-model="editDialog"
       :title="$t('personal.shopping.edit.title')"

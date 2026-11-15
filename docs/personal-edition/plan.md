@@ -79,7 +79,7 @@ Conséquence : partir de `mealie-next` ou de `v3.31.0` est équivalent aujourd'h
 
 ### 2.1 Stratégie de fork
 
-**Branches.** `mealie-next` reste un miroir exact de l'amont. Le travail vit sur une branche d'intégration. À chaque tag amont : fusion du tag, tests complets, nouvelle image.
+**Branches.** `mealie-next` est la branche principale du fork et contient le fork (le plan initial la gardait en miroir de l'amont). À chaque tag amont : fusion du tag, tests complets, nouvelle image.
 
 **Règle d'or : additif uniquement.** Aucune colonne ajoutée aux tables amont, aucune table amont modifiée. Tables du fork préfixées `pe_`.
 
@@ -323,6 +323,12 @@ d'appétit 0,75 / 1 / 1,25.
 | Colonnes JSON | Type JSON | Texte JSON | La sauvegarde native ne sait pas restaurer des valeurs imbriquées |
 | Clés étrangères vers `users` | Présentes | Supprimées | Elles auraient bloqué la suppression d'un utilisateur |
 | Données produits | Non prévu | Recherche des produits Coop, Migros, Aldi et Lidl par Open Food Facts | Demande ajoutée ; voir la limite ci-dessous |
+
+### Interface
+
+Une seconde passe a donné à l'application une apparence « verre liquide » et une organisation plus
+directe : page d'accueil « Aujourd'hui », barre d'onglets flottante sur téléphone avec un bouton « + »
+pour les actions courantes, en-têtes de page communs. Le détail est dans `FORK.md`, section « Apparence ».
 
 ### Limites connues
 

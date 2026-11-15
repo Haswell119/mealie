@@ -1,5 +1,5 @@
 <template>
-  <v-container class="narrow-container">
+  <v-container class="narrow-container pe-page">
     <BaseDialog
       v-model="createDialog"
       :title="$t('personal.inspirations.new')"
@@ -50,22 +50,12 @@
       @image-changed="bumpImage"
     />
 
-    <BasePageTitle divider>
-      <template #header>
-        <v-icon
-          size="80"
-          color="primary"
-          :icon="personalIcons.inspirations"
-        />
-      </template>
-      <template #title>
-        {{ $t('personal.inspirations.title') }}
-      </template>
-      {{ $t('personal.inspirations.subtitle') }}
-      <template #content>
-        <InspirationWorkflow class="mx-auto mt-3 justify-center" />
-      </template>
-    </BasePageTitle>
+    <PersonalPageHeader
+      :icon="personalIcons.inspirations"
+      :title="$t('personal.inspirations.title')"
+      :subtitle="$t('personal.inspirations.subtitle')"
+    />
+    <InspirationWorkflow class="mx-auto mb-4 justify-center" />
 
     <div class="d-flex justify-end mb-4">
       <BaseButton
@@ -132,6 +122,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import InspirationCard from "~/components/Domain/Inspiration/InspirationCard.vue";
 import InspirationDetailDialog from "~/components/Domain/Inspiration/InspirationDetailDialog.vue";
 import InspirationFields from "~/components/Domain/Inspiration/InspirationFields.vue";

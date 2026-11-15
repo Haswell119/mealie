@@ -1,5 +1,5 @@
 <template>
-  <v-container class="narrow-container">
+  <v-container class="narrow-container pe-page">
     <BaseDialog
       v-model="dialog"
       :title="editing ? $t('personal.people.edit') : $t('personal.people.new')"
@@ -181,19 +181,11 @@
       </v-card-text>
     </BaseDialog>
 
-    <BasePageTitle divider>
-      <template #header>
-        <v-icon
-          size="80"
-          color="primary"
-          :icon="personalIcons.people"
-        />
-      </template>
-      <template #title>
-        {{ $t('personal.people.title') }}
-      </template>
-      {{ $t('personal.people.subtitle') }}
-    </BasePageTitle>
+    <PersonalPageHeader
+      :icon="personalIcons.people"
+      :title="$t('personal.people.title')"
+      :subtitle="$t('personal.people.subtitle')"
+    />
 
     <div class="d-flex justify-end mb-4">
       <BaseButton
@@ -298,6 +290,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import { usePersonalApi } from "~/composables/personal/use-personal-api";
 import { personalIcons } from "~/composables/personal/use-personal-nav";
 import { useFoodStore } from "~/composables/store";

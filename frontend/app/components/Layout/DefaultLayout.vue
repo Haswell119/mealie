@@ -90,6 +90,7 @@
         </div>
       </v-scroll-x-transition>
     </v-main>
+    <PersonalBottomNav />
   </v-app>
 </template>
 
@@ -100,11 +101,13 @@ import { useGroupSelf } from "~/composables/use-groups";
 import { useCookbookPreferences } from "~/composables/use-users/preferences";
 import { useCookbookStore, usePublicCookbookStore } from "~/composables/store/use-cookbook-store";
 import type { CookBookOut } from "~/lib/api/types/cookbook";
-import { usePersonalCreateLinks, usePersonalSidebarLinks } from "~/composables/personal/use-personal-nav";
+import PersonalBottomNav from "~/components/Domain/Personal/PersonalBottomNav.vue";
+import { usePersonalCreateLinks, usePersonalSidebarLinks, usePersonalTopLinks } from "~/composables/personal/use-personal-nav";
 
 const i18n = useI18n();
 const { $globals } = useNuxtApp();
 const personalSidebarLinks = usePersonalSidebarLinks();
+const personalTopLinks = usePersonalTopLinks();
 const personalCreateLinks = usePersonalCreateLinks();
 const display = useDisplay();
 const auth = useMealieAuth();
@@ -228,6 +231,7 @@ const createLinks = computed(() => [
 ]);
 
 const topLinks = computed<SideBarLink[]>(() => [
+  ...personalTopLinks.value,
   {
     icon: $globals.icons.silverwareForkKnife,
     to: `/g/${groupSlug.value}`,

@@ -9,5 +9,19 @@
   "plan-a-meal": "Organiser un repas",
   "plan-a-meal-subtitle": "Invités, menu, portions",
   "generate-shopping": "Générer les courses",
-  "generate-shopping-subtitle": "Événement, semaine ou recettes"
+  "generate-shopping-subtitle": "Événement, semaine ou recettes",
+  "hub": "Aujourd'hui",
+  "tab-home": "Accueil",
+  "tab-recipes": "Recettes",
+  "tab-shopping": "Courses",
+  "tab-events": "Événements",
+  "quick-actions": "Que voulez-vous faire ?",
+  "quick-actions-open": "Créer",
+  "add-recipe": "Ajouter une recette",
+  "add-recipe-subtitle": "Depuis un lien, une photo ou à la main",
+  "add-stock": "Mettre à jour le stock",
+  "add-stock-subtitle": "Ce qu'il y a dans les placards",
+  "new-inspiration": "Noter une inspiration",
+  "new-inspiration-subtitle": "Une idée, un lien, une photo",
+  "main-navigation": "Navigation principale"
 }

@@ -1,24 +1,16 @@
 <template>
-  <v-container class="narrow-container">
+  <v-container class="narrow-container pe-page">
     <MealEventFormDialog
       v-model="dialog"
       :persons="persons"
       @saved="onCreated"
     />
 
-    <BasePageTitle divider>
-      <template #header>
-        <v-icon
-          size="80"
-          color="primary"
-          :icon="personalIcons.events"
-        />
-      </template>
-      <template #title>
-        {{ $t('personal.events.title') }}
-      </template>
-      {{ $t('personal.events.subtitle') }}
-    </BasePageTitle>
+    <PersonalPageHeader
+      :icon="personalIcons.events"
+      :title="$t('personal.events.title')"
+      :subtitle="$t('personal.events.subtitle')"
+    />
 
     <div class="d-flex justify-end mb-4">
       <BaseButton
@@ -94,6 +86,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import { mdiCalendar, mdiMapMarkerOutline } from "@mdi/js";
 import MealEventFormDialog from "~/components/Domain/MealEvent/MealEventFormDialog.vue";
 import MealEventStatusChip from "~/components/Domain/MealEvent/MealEventStatusChip.vue";

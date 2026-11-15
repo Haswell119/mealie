@@ -1,18 +1,10 @@
 <template>
-  <v-container class="narrow-container">
-    <BasePageTitle divider>
-      <template #header>
-        <v-icon
-          size="80"
-          color="primary"
-          :icon="personalIcons.pantry"
-        />
-      </template>
-      <template #title>
-        {{ $t('personal.pantry.title') }}
-      </template>
-      {{ $t('personal.pantry.subtitle') }}
-    </BasePageTitle>
+  <v-container class="narrow-container pe-page">
+    <PersonalPageHeader
+      :icon="personalIcons.pantry"
+      :title="$t('personal.pantry.title')"
+      :subtitle="$t('personal.pantry.subtitle')"
+    />
 
     <v-tabs
       v-model="tab"
@@ -51,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import PantryPackagings from "~/components/Domain/Pantry/PantryPackagings.vue";
 import PantryProducts from "~/components/Domain/Pantry/PantryProducts.vue";
 import PantryStock from "~/components/Domain/Pantry/PantryStock.vue";

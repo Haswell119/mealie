@@ -1,5 +1,5 @@
 <template>
-  <v-container class="narrow-container">
+  <v-container class="narrow-container pe-page">
     <BaseDialog
       v-model="dialog"
       :title="$t('personal.shopping.new-plan')"
@@ -32,19 +32,11 @@
       </v-card-text>
     </BaseDialog>
 
-    <BasePageTitle divider>
-      <template #header>
-        <v-icon
-          size="80"
-          color="primary"
-          :icon="personalIcons.shopping"
-        />
-      </template>
-      <template #title>
-        {{ $t('personal.shopping.title') }}
-      </template>
-      {{ $t('personal.shopping.subtitle') }}
-    </BasePageTitle>
+    <PersonalPageHeader
+      :icon="personalIcons.shopping"
+      :title="$t('personal.shopping.title')"
+      :subtitle="$t('personal.shopping.subtitle')"
+    />
 
     <div class="d-flex justify-end mb-4">
       <BaseButton
@@ -117,6 +109,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import ShoppingPlanForm, {
   emptyShoppingPlanForm,
   shoppingPlanFormIsValid,

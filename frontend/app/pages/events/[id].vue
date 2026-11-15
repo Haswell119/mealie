@@ -1,5 +1,5 @@
 <template>
-  <v-container class="narrow-container">
+  <v-container class="narrow-container pe-page">
     <v-alert
       v-if="notFound"
       type="error"

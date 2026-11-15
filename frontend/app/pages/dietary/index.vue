@@ -1,18 +1,10 @@
 <template>
-  <v-container class="narrow-container">
-    <BasePageTitle divider>
-      <template #header>
-        <v-icon
-          size="80"
-          color="primary"
-          :icon="personalIcons.dietary"
-        />
-      </template>
-      <template #title>
-        {{ $t('personal.dietary.title') }}
-      </template>
-      {{ $t('personal.dietary.subtitle') }}
-    </BasePageTitle>
+  <v-container class="narrow-container pe-page">
+    <PersonalPageHeader
+      :icon="personalIcons.dietary"
+      :title="$t('personal.dietary.title')"
+      :subtitle="$t('personal.dietary.subtitle')"
+    />
 
     <v-autocomplete
       v-model="foodId"
@@ -320,6 +312,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import PersonalStatusChip from "~/components/Domain/Personal/PersonalStatusChip.vue";
 import { useUserApi } from "~/composables/api";
 import { usePersonalApi } from "~/composables/personal/use-personal-api";

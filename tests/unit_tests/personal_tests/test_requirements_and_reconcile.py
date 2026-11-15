@@ -195,6 +195,25 @@ def test_nothing_to_buy_means_no_pack():
     assert lines[0].quantity_to_buy == Decimal("0")
 
 
+def test_food_counted_by_the_piece_is_rounded_up_to_whole_pieces():
+    bun, flour = uuid4(), uuid4()
+    lines = aggregate([need(bun, 4.25, None, "Pain burger"), need(flour, 487.5, GRAM, "Farine")])
+    apply_packaging(lines, {})
+
+    by_name = {line.food_name: line for line in lines}
+    assert by_name["Pain burger"].quantity_needed == Decimal("4.25")
+    assert by_name["Pain burger"].quantity_to_buy == Decimal("5")
+    # a food with a unit of measure keeps its exact quantity
+    assert by_name["Farine"].quantity_to_buy == Decimal("487.5")
+
+
+def test_whole_pieces_are_not_rounded_further():
+    egg = uuid4()
+    lines = aggregate([need(egg, 6, None, "Oeuf")])
+    apply_packaging(lines, {})
+    assert lines[0].quantity_to_buy == Decimal("6")
+
+
 def test_packaging_in_an_incompatible_unit_is_ignored():
     garlic = uuid4()
     lines = aggregate([need(garlic, 2, CLOVE, "Ail")])

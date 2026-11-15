@@ -1,0 +1,715 @@
+/*
+ * Mealie Personal Edition — "liquid glass" look.
+ *
+ * Every rule sits under `html.pe-glass`, which the plugin `personal-theme.client.ts` sets. Removing that
+ * class gives back the stock look of Mealie, so this file never changes a component: it only paints.
+ *
+ * The idea: a warm, softly coloured backdrop; translucent frosted surfaces with a hairline edge and a
+ * bright top rim; large continuous corners; floating bars. Real blur is kept for the chrome (bars, sheets,
+ * menus), where it is cheap. Content cards are frosted without blur, so long lists stay smooth on a phone.
+ */
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Tokens. Vuetify puts its colours on the element that carries the theme class, so the tokens go there. */
+
+html.pe-glass [class*="v-theme--"] {
+  --pe-radius-xl: 28px;
+  --pe-radius-lg: 22px;
+  --pe-radius-md: 16px;
+  --pe-radius-sm: 12px;
+  --pe-blur: blur(22px) saturate(170%);
+  --pe-glass: rgba(var(--v-theme-surface), 0.64);
+  --pe-glass-strong: rgba(var(--v-theme-surface), 0.82);
+  --pe-glass-chrome: rgba(var(--v-theme-surface), 0.7);
+  --pe-hairline: rgba(var(--v-theme-on-surface), 0.1);
+  --pe-rim: rgba(255, 255, 255, 0.7);
+  --pe-shadow: 0 1px 1px rgba(60, 40, 12, 0.04), 0 12px 32px -14px rgba(60, 40, 12, 0.28);
+  --pe-shadow-float: 0 2px 4px rgba(60, 40, 12, 0.06), 0 22px 48px -18px rgba(60, 40, 12, 0.42);
+  --pe-tint-a: rgba(var(--v-theme-primary), 0.2);
+  --pe-tint-b: rgba(255, 190, 110, 0.3);
+  --pe-tint-c: rgba(126, 178, 122, 0.2);
+  --pe-font-display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Nunito", "Quicksand", inherit;
+}
+
+html.pe-glass .v-theme--dark {
+  --pe-glass: rgba(var(--v-theme-surface), 0.56);
+  --pe-glass-strong: rgba(var(--v-theme-surface), 0.8);
+  --pe-glass-chrome: rgba(var(--v-theme-surface), 0.62);
+  --pe-hairline: rgba(255, 255, 255, 0.1);
+  --pe-rim: rgba(255, 255, 255, 0.12);
+  --pe-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 14px 34px -16px rgba(0, 0, 0, 0.7);
+  --pe-shadow-float: 0 2px 6px rgba(0, 0, 0, 0.35), 0 26px 54px -20px rgba(0, 0, 0, 0.85);
+  --pe-tint-a: rgba(var(--v-theme-primary), 0.16);
+  --pe-tint-b: rgba(255, 170, 90, 0.1);
+  --pe-tint-c: rgba(110, 170, 120, 0.1);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Backdrop */
+
+html.pe-glass .v-application {
+  background:
+    radial-gradient(62rem 40rem at 6% -8%, var(--pe-tint-a), transparent 62%),
+    radial-gradient(52rem 38rem at 104% 6%, var(--pe-tint-b), transparent 60%),
+    radial-gradient(56rem 44rem at 48% 112%, var(--pe-tint-c), transparent 62%), rgb(var(--v-theme-background)) !important;
+  background-attachment: fixed !important;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Chrome: app bar, drawer, footer */
+
+html.pe-glass .v-app-bar.v-toolbar {
+  background: rgba(var(--v-theme-primary), 0.78) !important;
+  -webkit-backdrop-filter: var(--pe-blur);
+  backdrop-filter: var(--pe-blur);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 30px -18px rgba(60, 40, 12, 0.55) !important;
+}
+
+html.pe-glass .v-navigation-drawer {
+  background: var(--pe-glass-chrome) !important;
+  -webkit-backdrop-filter: var(--pe-blur);
+  backdrop-filter: var(--pe-blur);
+  border-right: 1px solid var(--pe-hairline) !important;
+}
+
+html.pe-glass .v-navigation-drawer .v-list {
+  background: transparent !important;
+}
+
+html.pe-glass .v-navigation-drawer .v-list-item {
+  border-radius: var(--pe-radius-sm);
+  margin-inline: 8px;
+}
+
+html.pe-glass .v-navigation-drawer .v-list-item--active {
+  background: rgba(var(--v-theme-primary), 0.14);
+  box-shadow: inset 0 1px 0 var(--pe-rim);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Surfaces */
+
+html.pe-glass .v-card:not(.v-card--variant-text):not(.v-card--variant-plain) {
+  border-radius: var(--pe-radius-lg);
+  border: 1px solid var(--pe-hairline);
+}
+
+html.pe-glass .v-card.v-card--variant-elevated,
+html.pe-glass .v-card.v-card--variant-flat {
+  background: var(--pe-glass);
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim),
+    var(--pe-shadow) !important;
+}
+
+html.pe-glass .v-card.v-card--variant-outlined {
+  background: rgba(var(--v-theme-surface), 0.36);
+  box-shadow: inset 0 1px 0 var(--pe-rim);
+}
+
+/* A card keeps its coloured edge marker, drawn inside the rounded shape. */
+html.pe-glass .v-card.left-border,
+html.pe-glass .v-card.left-warning-border {
+  border-left-width: 5px !important;
+}
+
+html.pe-glass .v-card .v-list,
+html.pe-glass .v-card .v-table,
+html.pe-glass .v-card .v-expansion-panel {
+  background: transparent;
+}
+
+html.pe-glass .v-expansion-panel {
+  background: var(--pe-glass);
+  border: 1px solid var(--pe-hairline);
+}
+
+html.pe-glass .v-expansion-panels:not(.v-expansion-panels--variant-accordion) > .v-expansion-panel {
+  border-radius: var(--pe-radius-md) !important;
+}
+
+html.pe-glass .v-expansion-panel__shadow {
+  box-shadow: none;
+}
+
+html.pe-glass .v-sheet.v-alert,
+html.pe-glass .v-alert {
+  border-radius: var(--pe-radius-md);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Floating layers: dialogs, sheets, menus, toasts. These get the real blur. */
+
+html.pe-glass .v-dialog > .v-overlay__content > .v-card,
+html.pe-glass .v-bottom-sheet > .v-overlay__content > .v-card,
+html.pe-glass .v-bottom-sheet > .v-overlay__content > .v-sheet {
+  background: var(--pe-glass-strong);
+  -webkit-backdrop-filter: var(--pe-blur);
+  backdrop-filter: var(--pe-blur);
+  border: 1px solid var(--pe-hairline);
+  border-radius: var(--pe-radius-xl);
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim),
+    var(--pe-shadow-float) !important;
+  overflow: hidden;
+}
+
+html.pe-glass .v-dialog--fullscreen > .v-overlay__content > .v-card {
+  border-radius: 0;
+  border: 0;
+}
+
+html.pe-glass .v-bottom-sheet > .v-overlay__content > .v-card,
+html.pe-glass .v-bottom-sheet > .v-overlay__content > .v-sheet {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+html.pe-glass .v-menu > .v-overlay__content > .v-list,
+html.pe-glass .v-menu > .v-overlay__content > .v-card,
+html.pe-glass .v-menu > .v-overlay__content > .v-sheet,
+html.pe-glass .v-autocomplete__content > .v-list,
+html.pe-glass .v-select__content > .v-list,
+html.pe-glass .v-combobox__content > .v-list {
+  background: var(--pe-glass-strong) !important;
+  -webkit-backdrop-filter: var(--pe-blur);
+  backdrop-filter: var(--pe-blur);
+  border: 1px solid var(--pe-hairline);
+  border-radius: var(--pe-radius-md) !important;
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim),
+    var(--pe-shadow-float) !important;
+}
+
+html.pe-glass .v-menu > .v-overlay__content,
+html.pe-glass .v-autocomplete__content,
+html.pe-glass .v-select__content,
+html.pe-glass .v-combobox__content {
+  border-radius: var(--pe-radius-md) !important;
+  box-shadow: none !important;
+}
+
+html.pe-glass .v-overlay__scrim {
+  background: rgb(30, 20, 8);
+  opacity: 0.28;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+html.pe-glass .v-snackbar__wrapper {
+  border-radius: var(--pe-radius-md);
+  box-shadow: var(--pe-shadow-float);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Controls */
+
+html.pe-glass .v-btn:not(.v-btn--icon):not(.v-btn--rounded) {
+  border-radius: 999px;
+}
+
+html.pe-glass .v-btn {
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+}
+
+html.pe-glass .v-btn.v-btn--variant-elevated:not(.v-btn--icon),
+html.pe-glass .v-btn.v-btn--variant-flat:not(.v-btn--icon) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 6px 16px -8px rgba(60, 40, 12, 0.5);
+}
+
+html.pe-glass .v-btn.v-btn--variant-tonal,
+html.pe-glass .v-btn.v-btn--variant-outlined {
+  box-shadow: inset 0 1px 0 var(--pe-rim);
+}
+
+html.pe-glass .v-btn:not(.v-btn--disabled):active {
+  transform: scale(0.97);
+}
+
+html.pe-glass .v-btn {
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+html.pe-glass .v-field {
+  border-radius: var(--pe-radius-sm);
+}
+
+html.pe-glass .v-field--variant-filled .v-field__overlay,
+html.pe-glass .v-field--variant-solo-filled .v-field__overlay {
+  border-radius: var(--pe-radius-sm);
+}
+
+html.pe-glass .v-field--variant-filled,
+html.pe-glass .v-field--variant-solo,
+html.pe-glass .v-field--variant-solo-filled {
+  border-top-left-radius: var(--pe-radius-sm);
+  border-top-right-radius: var(--pe-radius-sm);
+}
+
+html.pe-glass .v-chip.v-chip--label {
+  border-radius: 10px;
+}
+
+html.pe-glass .v-toolbar-title,
+html.pe-glass .v-card-title,
+html.pe-glass h1,
+html.pe-glass h2,
+html.pe-glass h3,
+html.pe-glass [class*="text-headline"],
+html.pe-glass [class*="text-title"],
+html.pe-glass .text-h4,
+html.pe-glass .text-h5,
+html.pe-glass .text-h6 {
+  font-family: var(--pe-font-display);
+  letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Pages of the personal edition */
+
+.pe-page {
+  padding-bottom: 32px;
+}
+
+.pe-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  margin: 12px 0 20px;
+  border-radius: var(--pe-radius-xl, 28px);
+  border: 1px solid var(--pe-hairline, rgba(0, 0, 0, 0.1));
+  background:
+    linear-gradient(135deg, rgba(var(--v-theme-primary), 0.16), rgba(var(--v-theme-primary), 0.02) 60%),
+    var(--pe-glass, rgb(var(--v-theme-surface)));
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim, transparent),
+    var(--pe-shadow, none);
+  overflow: hidden;
+}
+
+.pe-hero::after {
+  content: "";
+  position: absolute;
+  inset: -40% 40% auto -10%;
+  height: 120%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.5), transparent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.v-theme--dark .pe-hero::after {
+  opacity: 0.08;
+}
+
+.pe-hero__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  color: rgb(var(--v-theme-on-primary));
+  background: linear-gradient(160deg, rgba(var(--v-theme-primary), 0.92), rgba(var(--v-theme-primary), 0.72));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 10px 20px -10px rgba(var(--v-theme-primary), 0.9);
+}
+
+.pe-hero__text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  flex: 1;
+}
+
+.pe-hero__title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.pe-hero__subtitle {
+  margin-top: 4px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: rgba(var(--v-theme-on-surface), 0.72);
+}
+
+.pe-hero__actions {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .pe-hero {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .pe-hero__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 15px;
+  }
+
+  .pe-hero__title {
+    font-size: 1.3rem;
+  }
+
+  .pe-hero__actions {
+    width: 100%;
+  }
+
+  .pe-hero__actions > .v-btn {
+    flex: 1;
+  }
+}
+
+/* Tabs of the personal pages read as one segmented control. */
+html.pe-glass .pe-page .v-tabs,
+html.pe-glass .pe-segmented {
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(var(--v-theme-on-surface), 0.06);
+  border: 1px solid var(--pe-hairline);
+  box-shadow: inset 0 1px 2px rgba(60, 40, 12, 0.08);
+}
+
+/* The control is 48px tall with 4px of padding, so each segment is 40px and sits fully inside it. */
+html.pe-glass .pe-page .v-tabs {
+  --v-tabs-height: 40px;
+  box-sizing: border-box;
+  height: 50px;
+}
+
+html.pe-glass .pe-page .v-tabs .v-tab {
+  border-radius: 999px !important;
+  min-width: 0;
+  height: 40px;
+}
+
+html.pe-glass .pe-page .v-tabs .v-tab__slider {
+  display: none;
+}
+
+html.pe-glass .pe-page .v-tabs .v-tab--selected {
+  background: var(--pe-glass-strong);
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim),
+    0 4px 12px -6px rgba(60, 40, 12, 0.45);
+}
+
+/* Tiles: the big tappable squares of the home page. */
+.pe-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 16px;
+  border-radius: var(--pe-radius-lg, 22px);
+  border: 1px solid var(--pe-hairline, rgba(0, 0, 0, 0.1));
+  background: var(--pe-glass, rgb(var(--v-theme-surface)));
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim, transparent),
+    var(--pe-shadow, none);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.2s ease;
+}
+
+a.pe-tile:hover,
+button.pe-tile:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim, transparent),
+    var(--pe-shadow-float, none);
+}
+
+a.pe-tile:active,
+button.pe-tile:active {
+  transform: scale(0.98);
+}
+
+a.pe-tile:focus-visible,
+button.pe-tile:focus-visible {
+  outline: 3px solid rgba(var(--v-theme-primary), 0.6);
+  outline-offset: 2px;
+}
+
+.pe-tile__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.14);
+  box-shadow: inset 0 1px 0 var(--pe-rim, transparent);
+}
+
+.pe-tile--primary {
+  color: rgb(var(--v-theme-on-primary));
+  border-color: rgba(255, 255, 255, 0.28);
+  background: linear-gradient(160deg, rgba(var(--v-theme-primary), 0.95), rgba(var(--v-theme-primary), 0.74));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 16px 32px -16px rgba(var(--v-theme-primary), 0.95);
+}
+
+.pe-tile--primary .pe-tile__icon {
+  color: rgb(var(--v-theme-on-primary));
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.pe-tile__title {
+  font-family: var(--pe-font-display, inherit);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.pe-tile__hint {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  opacity: 0.74;
+}
+
+.pe-tile__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* On a phone, an action tile lies flat: icon on the left, text on the right. Three of them fit above the fold. */
+@media (max-width: 599px) {
+  .pe-tile--action {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+  }
+}
+
+.pe-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 26px 4px 10px;
+  font-family: var(--pe-font-display, inherit);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Floating tab bar (phones) */
+
+.pe-tabbar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 1004;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: min(430px, calc(100vw - 24px));
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--pe-hairline, rgba(0, 0, 0, 0.12));
+  background: var(--pe-glass-chrome, rgb(var(--v-theme-surface)));
+  -webkit-backdrop-filter: var(--pe-blur, none);
+  backdrop-filter: var(--pe-blur, none);
+  box-shadow:
+    inset 0 1px 0 var(--pe-rim, transparent),
+    var(--pe-shadow-float, 0 8px 24px rgba(0, 0, 0, 0.25));
+}
+
+.pe-tabbar__item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 4px 6px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.12s ease;
+}
+
+.pe-tabbar__item span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pe-tabbar__item:active {
+  transform: scale(0.94);
+}
+
+.pe-tabbar__item:focus-visible {
+  outline: 3px solid rgba(var(--v-theme-primary), 0.6);
+  outline-offset: 1px;
+}
+
+.pe-tabbar__item--active {
+  color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.14);
+  box-shadow: inset 0 1px 0 var(--pe-rim, transparent);
+}
+
+.pe-tabbar__add {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: -2px 4px;
+  border: 0;
+  border-radius: 50%;
+  color: rgb(var(--v-theme-on-primary));
+  background: linear-gradient(160deg, rgba(var(--v-theme-primary), 1), rgba(var(--v-theme-primary), 0.78));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 12px 22px -10px rgba(var(--v-theme-primary), 0.95);
+  cursor: pointer;
+  transition: transform 0.14s ease;
+}
+
+.pe-tabbar__add:active {
+  transform: scale(0.92);
+}
+
+.pe-tabbar__add:focus-visible {
+  outline: 3px solid rgba(var(--v-theme-primary), 0.6);
+  outline-offset: 3px;
+}
+
+/* Leave room for the tab bar under the content, and lift the toasts above it. */
+html.pe-has-tabbar .v-main {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+html.pe-has-tabbar .v-snackbar {
+  margin-bottom: 84px;
+}
+
+/*
+ * A page that brings its own bar at the bottom of the screen keeps it: the native shopping list puts
+ * "add an item" there, which matters more in a shop than the navigation.
+ */
+html.pe-has-tabbar:has(.v-navigation-drawer--bottom) .pe-tabbar,
+html.pe-has-tabbar:has(.v-bottom-navigation) .pe-tabbar {
+  display: none;
+}
+
+html.pe-has-tabbar:has(.v-navigation-drawer--bottom) .v-snackbar,
+html.pe-has-tabbar:has(.v-bottom-navigation) .v-snackbar {
+  margin-bottom: 0;
+}
+
+@media print {
+  .pe-tabbar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* Motion: one gentle entrance per page */
+
+@keyframes pe-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html.pe-glass .pe-page > * {
+  animation: pe-rise 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+html.pe-glass .pe-page > *:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+html.pe-glass .pe-page > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+html.pe-glass .pe-page > *:nth-child(n + 4) {
+  animation-delay: 0.14s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.pe-glass .pe-page > *,
+  html.pe-glass .v-btn,
+  .pe-tile,
+  .pe-tabbar__item,
+  .pe-tabbar__add {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* People who ask for less transparency, and browsers without blur, get solid surfaces. */
+
+@media (prefers-reduced-transparency: reduce) {
+  html.pe-glass [class*="v-theme--"] {
+    --pe-glass: rgb(var(--v-theme-surface));
+    --pe-glass-strong: rgb(var(--v-theme-surface));
+    --pe-glass-chrome: rgb(var(--v-theme-surface));
+    --pe-blur: none;
+  }
+
+  html.pe-glass .v-app-bar.v-toolbar {
+    background: rgb(var(--v-theme-primary)) !important;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html.pe-glass [class*="v-theme--"] {
+    --pe-glass-strong: rgba(var(--v-theme-surface), 0.97);
+    --pe-glass-chrome: rgba(var(--v-theme-surface), 0.96);
+  }
+
+  html.pe-glass .v-app-bar.v-toolbar {
+    background: rgb(var(--v-theme-primary)) !important;
+  }
+}

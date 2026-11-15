@@ -168,11 +168,20 @@ def apply_stock(lines: list[RequirementLine], stock: list[StockEntry]) -> None:
 
 
 def apply_packaging(lines: list[RequirementLine], packagings: dict[UUID, Packaging]) -> None:
-    """Round the quantity to buy up to a whole number of packs, for each food that has a pack size."""
+    """
+    Round the quantity to buy up to what a shop sells.
+
+    A food with a pack size is rounded up to whole packs. A food that is counted by the piece (no unit) is
+    rounded up to whole pieces: nobody buys a quarter of a bun.
+    """
     for line in lines:
         line.packs = None
         line.pack_label = None
-        if line.food_id is None or line.food_id not in packagings or line.quantity_to_buy <= 0:
+        if line.food_id is None or line.quantity_to_buy <= 0:
+            continue
+        if line.food_id not in packagings:
+            if line.unit is None:
+                line.quantity_to_buy = quantize(line.quantity_to_buy.to_integral_value(rounding=ROUND_CEILING))
             continue
 
         packaging = packagings[line.food_id]

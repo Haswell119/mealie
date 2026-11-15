@@ -1,18 +1,10 @@
 <template>
-  <v-container class="narrow-container">
-    <BasePageTitle divider>
-      <template #header>
-        <v-icon
-          size="80"
-          color="primary"
-          :icon="personalIcons.assistant"
-        />
-      </template>
-      <template #title>
-        {{ $t('personal.assistant.title') }}
-      </template>
-      {{ $t('personal.assistant.subtitle') }}
-    </BasePageTitle>
+  <v-container class="narrow-container pe-page">
+    <PersonalPageHeader
+      :icon="personalIcons.assistant"
+      :title="$t('personal.assistant.title')"
+      :subtitle="$t('personal.assistant.subtitle')"
+    />
 
     <!-- Status -->
     <v-alert
@@ -305,6 +297,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonalPageHeader from "~/components/Domain/Personal/PersonalPageHeader.vue";
 import { mdiSend } from "@mdi/js";
 import AssistantProposalCard from "~/components/Domain/Assistant/AssistantProposalCard.vue";
 import { usePersonalApi } from "~/composables/personal/use-personal-api";
