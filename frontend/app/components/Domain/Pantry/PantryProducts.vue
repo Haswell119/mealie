@@ -139,53 +139,65 @@
       data-testid="product-loader"
     />
 
-    <v-alert
+    <div
       v-if="imported"
-      ref="importAlert"
-      type="success"
-      variant="tonal"
-      closable
-      class="mb-3"
+      ref="importResult"
+      class="mb-3 product-import-result"
       data-testid="product-import-result"
-      @click:close="imported = null"
     >
-      <div class="font-weight-medium">
-        {{ $t('personal.pantry.products.linked', { product: imported.out.product.name, food: imported.foodName }) }}
-      </div>
-      <div
-        v-if="imported.out.packaging"
-        data-testid="product-import-packaging"
+      <v-alert
+        type="success"
+        variant="tonal"
+        density="compact"
+        closable
+        class="mb-2"
+        @click:close="imported = null"
       >
-        {{ $t('personal.pantry.products.packaging-created', { label: packagingText(imported.out.packaging) }) }}
-      </div>
-      <template v-if="imported.out.hints.length">
-        <div class="font-weight-medium mt-2">
-          {{ $t('personal.pantry.products.hints-title') }}
+        <div class="font-weight-medium">
+          {{ $t('personal.pantry.products.linked', { product: imported.out.product.name, food: imported.foodName }) }}
         </div>
-        <ul class="product-hints">
-          <li
-            v-for="hint in imported.out.hints"
-            :key="hint"
-            data-testid="product-import-hint"
-          >
-            {{ hintText(hint) }}
-          </li>
-        </ul>
-      </template>
-      <div class="mt-2">
-        {{ $t('personal.pantry.products.hint-warning') }}
-      </div>
-      <v-btn
-        variant="outlined"
-        size="small"
-        class="mt-2"
-        :to="`/dietary?food=${imported.foodId}`"
-        :prepend-icon="personalIcons.dietary"
-        data-testid="product-check-food"
+        <div
+          v-if="imported.out.packaging"
+          data-testid="product-import-packaging"
+        >
+          {{ $t('personal.pantry.products.packaging-created', { label: packagingText(imported.out.packaging) }) }}
+        </div>
+      </v-alert>
+      <v-alert
+        type="warning"
+        variant="tonal"
+        density="compact"
+        data-testid="product-import-hints"
       >
-        {{ $t('personal.pantry.products.check-food') }}
-      </v-btn>
-    </v-alert>
+        <template v-if="imported.out.hints.length">
+          <div class="font-weight-medium">
+            {{ $t('personal.pantry.products.hints-title') }}
+          </div>
+          <ul class="product-hints mb-2">
+            <li
+              v-for="hint in imported.out.hints"
+              :key="hint"
+              data-testid="product-import-hint"
+            >
+              {{ hintText(hint) }}
+            </li>
+          </ul>
+        </template>
+        <div class="font-weight-medium">
+          {{ $t('personal.pantry.products.hint-warning') }}
+        </div>
+        <v-btn
+          variant="outlined"
+          size="small"
+          class="mt-2"
+          :to="`/dietary?food=${imported.foodId}`"
+          :prepend-icon="personalIcons.dietary"
+          data-testid="product-check-food"
+        >
+          {{ $t('personal.pantry.products.check-food') }}
+        </v-btn>
+      </v-alert>
+    </div>
 
     <v-alert
       v-if="result && !result.available"
@@ -383,7 +395,7 @@ const linkProduct = ref<ProductBase | null>(null);
 const linkFoodId = ref<string | null>(null);
 const createPackaging = ref(true);
 const imported = ref<{ out: ProductImportOut; foodId: string; foodName: string } | null>(null);
-const importAlert = ref<{ $el?: HTMLElement } | null>(null);
+const importResult = ref<HTMLElement | null>(null);
 
 const deleteDialog = ref(false);
 const deleting = ref<ProductOut | null>(null);
@@ -488,7 +500,7 @@ async function importProduct() {
   emit("imported");
   await loadSaved();
   await nextTick();
-  importAlert.value?.$el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  importResult.value?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function askDelete(product: ProductOut) {
@@ -521,6 +533,11 @@ onMounted(() => {
   object-fit: contain;
   border-radius: 4px;
   background: #fff;
+}
+
+/* The fixed application bar must not cover the result when the page scrolls to it. */
+.product-import-result {
+  scroll-margin-top: 72px;
 }
 
 .product-text {

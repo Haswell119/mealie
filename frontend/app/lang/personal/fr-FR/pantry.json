@@ -22,7 +22,6 @@
     "location": "Emplacement",
     "location-hint": "Frigo, congélateur, cave…",
     "note": "Remarque",
-    "no-unit": "Sans unité",
     "decrease": "Retirer 1",
     "increase": "Ajouter 1",
     "delete-confirm": "Retirer « {name} » du stock ?"

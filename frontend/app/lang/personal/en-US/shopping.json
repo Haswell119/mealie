@@ -3,7 +3,6 @@
   "subtitle": "A shopping plan works out what your meals need, takes off the confirmed stock, rounds up to pack sizes, then writes the result to your normal shopping list — without undoing your purchases or your manual changes.",
   "new-plan": "New shopping plan",
   "empty": "No shopping plan yet. Create one from an event, from this week's meal plan or from a few recipes.",
-  "open-plan": "Open the plan",
   "source": {
     "EVENT": "Event",
     "MEALPLAN": "Meal plan",
@@ -44,7 +43,6 @@
     "create": "Create the plan"
   },
   "default-name": {
-    "generic": "Shopping",
     "EVENT": "Shopping — {name}",
     "MEALPLAN": "Shopping from {from} to {to}",
     "RECIPES": "Shopping — {name}",

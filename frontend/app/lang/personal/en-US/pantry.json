@@ -22,7 +22,6 @@
     "location": "Location",
     "location-hint": "Fridge, freezer, cellar…",
     "note": "Note",
-    "no-unit": "No unit",
     "decrease": "Remove 1",
     "increase": "Add 1",
     "delete-confirm": "Remove \"{name}\" from the stock?"

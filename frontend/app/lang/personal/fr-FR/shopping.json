@@ -3,7 +3,6 @@
   "subtitle": "Un plan de courses calcule ce qu'il faut pour vos repas, retire le stock confirmé, arrondit aux conditionnements, puis écrit le résultat dans votre liste de courses habituelle — sans annuler vos achats ni vos modifications manuelles.",
   "new-plan": "Nouveau plan de courses",
   "empty": "Aucun plan de courses pour l'instant. Créez-en un à partir d'un événement, du planning de la semaine ou de quelques recettes.",
-  "open-plan": "Ouvrir le plan",
   "source": {
     "EVENT": "Événement",
     "MEALPLAN": "Planning",
@@ -44,7 +43,6 @@
     "create": "Créer le plan"
   },
   "default-name": {
-    "generic": "Courses",
     "EVENT": "Courses — {name}",
     "MEALPLAN": "Courses du {from} au {to}",
     "RECIPES": "Courses — {name}",
