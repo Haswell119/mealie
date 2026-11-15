@@ -685,6 +685,17 @@ export interface ProductSearchOut {
   available: boolean;
   products: ProductBase[];
 }
+export interface RecipeComplianceOut {
+  recipeId: string;
+  recipeName: string;
+  recipeSlug: string;
+  restrictionKeys: string[];
+  status: VerificationStatus;
+  statuses: {
+    [k: string]: VerificationStatus;
+  };
+  findings: FindingOut[];
+}
 export interface ShoppingPlanApply {
   shoppingListId?: string | null;
   restoreDismissed?: boolean;

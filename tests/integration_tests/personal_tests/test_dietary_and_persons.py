@@ -11,7 +11,7 @@ from mealie.services.personal.dietary_service import DietaryService
 from mealie.services.personal.errors import PersonalError
 from tests.utils.fixture_schemas import TestUser
 
-from .helpers import BASE, create_food, create_person, restriction_ids, verify_food
+from .helpers import BASE, create_food, create_person, create_recipe, restriction_ids, verify_food
 
 
 def test_standard_restrictions_are_created_once(api_client: TestClient, unique_user: TestUser):
@@ -258,3 +258,43 @@ def test_error_messages_follow_the_language_of_the_request(api_client: TestClien
     missing = api_client.get(f"{BASE}/persons/{uuid4()}", headers=headers)
     assert missing.status_code == 404
     assert missing.json()["detail"]["message"] == "Personne introuvable."
+
+
+def test_recipe_is_checked_against_the_restrictions_of_the_user(api_client: TestClient, unique_user: TestUser):
+    ids = restriction_ids(api_client, unique_user)
+    create_person(
+        api_client,
+        unique_user,
+        "Moi",
+        isMe=True,
+        restrictions=[{"restrictionId": ids["gluten"], "defaultScope": "ENTIRE_PREPARATION"}],
+    )
+    rice = create_food(unique_user, f"Riz {uuid4().hex[:6]}")
+    wheat = create_food(unique_user, f"Farine de blé {uuid4().hex[:6]}")
+    safe = create_recipe(unique_user, ingredients=[(200, None, rice, "")])
+    unsafe = create_recipe(unique_user, ingredients=[(200, None, rice, ""), (100, None, wheat, "")])
+
+    def check(recipe, **params) -> dict:
+        response = api_client.get(f"{BASE}/dietary/recipes/{recipe.id}", params=params, headers=unique_user.token)
+        assert response.status_code == 200, response.text
+        return response.json()
+
+    # an unknown food is never cleared on its own
+    result = check(safe)
+    assert result["restrictionKeys"] == ["gluten"]
+    assert result["status"] == "UNVERIFIED"
+    assert result["findings"][0]["code"] == "NO_DATA"
+
+    verify_food(api_client, unique_user, rice.id, ids["gluten"])
+    assert check(safe)["status"] == "VERIFIED"
+
+    result = check(unsafe)
+    assert result["status"] == "INCOMPATIBLE"
+    assert [(f["code"], f["term"]) for f in result["findings"]] == [("RULE_MATCH", "blé")]
+
+    # other restrictions can be asked for explicitly
+    result = check(safe, restriction=["meat", "fish", "does-not-exist"])
+    assert result["restrictionKeys"] == ["fish", "meat"]
+    assert result["statuses"] == {"fish": "UNVERIFIED", "meat": "UNVERIFIED"}
+
+    assert api_client.get(f"{BASE}/dietary/recipes/{uuid4()}", headers=unique_user.token).status_code == 404

@@ -16,5 +16,11 @@
   "tools-help": "A flagged tool shows in the checklist when a restriction covers the whole preparation.",
   "tool": "Tool",
   "flag-tool": "Flag a tool",
-  "no-tools": "No flagged tool."
+  "no-tools": "No flagged tool.",
+  "check-recipe-title": "Check a recipe",
+  "check-recipe-help": "Checks a recipe against your own restrictions. Tap an ingredient to verify it.",
+  "pick-recipe": "Pick a recipe",
+  "no-own-restrictions": "Create your own profile in \"People\" first, with your restrictions.",
+  "all-verified": "Every ingredient is verified for your restrictions.",
+  "open-recipe": "Open the recipe"
 }

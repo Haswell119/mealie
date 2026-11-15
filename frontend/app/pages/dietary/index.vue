@@ -99,6 +99,77 @@
     </BaseDialog>
 
     <h3 class="text-h6 mt-6 mb-2">
+      {{ $t('personal.dietary.check-recipe-title') }}
+    </h3>
+    <p class="text-body-2 text-medium-emphasis">
+      {{ $t('personal.dietary.check-recipe-help') }}
+    </p>
+    <v-autocomplete
+      v-model="recipeId"
+      :items="recipes"
+      item-title="name"
+      item-value="id"
+      :label="$t('personal.dietary.pick-recipe')"
+      clearable
+      density="compact"
+      data-testid="dietary-recipe"
+    />
+    <v-card
+      v-if="recipeCheck"
+      class="mb-6"
+      data-testid="dietary-recipe-result"
+    >
+      <v-card-title class="d-flex align-center flex-wrap ga-2">
+        <span>{{ recipeCheck.recipeName }}</span>
+        <PersonalStatusChip
+          v-if="recipeCheck.restrictionKeys.length"
+          :status="recipeCheck.status"
+        />
+      </v-card-title>
+      <v-card-text>
+        <v-alert
+          v-if="!recipeCheck.restrictionKeys.length"
+          type="info"
+          variant="tonal"
+          density="compact"
+        >
+          {{ $t('personal.dietary.no-own-restrictions') }}
+        </v-alert>
+        <v-alert
+          v-else-if="!recipeCheck.findings.length"
+          type="success"
+          variant="tonal"
+          density="compact"
+        >
+          {{ $t('personal.dietary.all-verified') }}
+        </v-alert>
+        <v-list
+          v-else
+          density="compact"
+          lines="two"
+        >
+          <v-list-item
+            v-for="(finding, index) in sortedFindings"
+            :key="index"
+            :disabled="!finding.foodId"
+            @click="finding.foodId ? (foodId = finding.foodId) : undefined"
+          >
+            <template #prepend>
+              <PersonalStatusChip
+                :status="finding.status"
+                class="mr-2"
+              />
+            </template>
+            <v-list-item-title>{{ finding.subject }}</v-list-item-title>
+            <v-list-item-subtitle>
+              {{ restrictionName(finding.restrictionKey) }} · {{ text.finding(finding) }}
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+      </v-card-text>
+    </v-card>
+
+    <h3 class="text-h6 mt-6 mb-2">
       {{ $t('personal.dietary.restrictions-title') }}
     </h3>
     <div class="d-flex flex-wrap ga-2 mb-3">
@@ -250,6 +321,7 @@
 
 <script setup lang="ts">
 import PersonalStatusChip from "~/components/Domain/Personal/PersonalStatusChip.vue";
+import { useUserApi } from "~/composables/api";
 import { usePersonalApi } from "~/composables/personal/use-personal-api";
 import { personalIcons } from "~/composables/personal/use-personal-nav";
 import { usePersonalText } from "~/composables/personal/use-personal-text";
@@ -258,6 +330,7 @@ import type {
   DietaryRestrictionOut,
   FoodComplianceOut,
   FoodRestrictionEffective,
+  RecipeComplianceOut,
   RestrictionKind,
   ToolRestrictionStatusOut,
   VerificationStatus,
@@ -289,6 +362,31 @@ const toolForm = ref<{ toolId: string | null; restrictionId: string | null; reas
   restrictionId: null,
   reason: "",
 });
+
+const userApi = useUserApi();
+const recipes = ref<{ id?: string | null; name?: string | null }[]>([]);
+const recipeId = ref<string | null>(null);
+const recipeCheck = ref<RecipeComplianceOut | null>(null);
+
+const sortedFindings = computed(() => {
+  const order = { INCOMPATIBLE: 0, UNVERIFIED: 1, VERIFIED: 2 };
+  return [...(recipeCheck.value?.findings ?? [])].sort((a, b) => order[a.status] - order[b.status]);
+});
+
+function restrictionName(key: string): string {
+  return restrictions.value.find(restriction => restriction.key === key)?.name ?? key;
+}
+
+async function loadRecipeCheck() {
+  if (!recipeId.value) {
+    recipeCheck.value = null;
+    return;
+  }
+  const { data } = await api.dietary.getRecipe(recipeId.value);
+  recipeCheck.value = data;
+}
+
+watch(recipeId, loadRecipeCheck);
 
 const restrictionForm = ref<{ name: string; kind: RestrictionKind }>({ name: "", kind: "PREFERENCE" });
 const kindItems = computed(() =>
@@ -347,7 +445,7 @@ async function applyStatus() {
     status: pending.value.status,
     reason: reason.value || null,
   });
-  await loadFood();
+  await Promise.all([loadFood(), loadRecipeCheck()]);
 }
 
 async function clearStatus(restriction: FoodRestrictionEffective) {
@@ -355,7 +453,7 @@ async function clearStatus(restriction: FoodRestrictionEffective) {
     return;
   }
   await api.dietary.clearFoodStatus(foodId.value, restriction.restrictionId);
-  await loadFood();
+  await Promise.all([loadFood(), loadRecipeCheck()]);
 }
 
 function toolName(toolId: string): string {
@@ -388,5 +486,7 @@ async function unflagTool(id: string) {
 onMounted(async () => {
   await loadRestrictions();
   await Promise.all([loadFood(), loadTools()]);
+  const { data } = await userApi.recipes.getAll(1, -1, { orderBy: "name", orderDirection: "asc" });
+  recipes.value = data?.items ?? [];
 });
 </script>

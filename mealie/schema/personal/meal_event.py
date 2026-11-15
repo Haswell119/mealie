@@ -202,6 +202,18 @@ class FindingOut(MealieOutModel):
     person_name: str | None = None
 
 
+class RecipeComplianceOut(MealieOutModel):
+    """The state of one recipe for a set of restrictions, outside of any event."""
+
+    recipe_id: UUID4
+    recipe_name: str = ""
+    recipe_slug: str = ""
+    restriction_keys: list[str] = []
+    status: VerificationStatus = VerificationStatus.UNVERIFIED
+    statuses: dict[str, VerificationStatus] = {}
+    findings: list[FindingOut] = []
+
+
 class VariantAnalysisOut(MealieOutModel):
     variant_id: UUID4
     recipe_id: UUID4

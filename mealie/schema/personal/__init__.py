@@ -77,6 +77,7 @@ from .meal_event import (
     MealEventVariantOut,
     MenuItemAnalysisOut,
     PersonConstraintsOut,
+    RecipeComplianceOut,
     VariantAnalysisOut,
 )
 from .pantry import (
@@ -177,6 +178,7 @@ __all__ = [
     "MealEventVariantOut",
     "MenuItemAnalysisOut",
     "PersonConstraintsOut",
+    "RecipeComplianceOut",
     "VariantAnalysisOut",
     "DietaryRestrictionCreate",
     "DietaryRestrictionOut",

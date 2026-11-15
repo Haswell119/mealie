@@ -34,6 +34,7 @@ import type {
   ProductImportOut,
   ProductOut,
   ProductSearchOut,
+  RecipeComplianceOut,
   RetailStore,
   ShoppingPlanApply,
   ShoppingPlanApplyOut,
@@ -89,6 +90,11 @@ export class DietaryApi extends BaseAPI {
 
   async setFoodStatusBulk(payload: FoodBulkVerify) {
     return await this.requests.post<FoodRestrictionStatusOut[]>(`${prefix}/dietary/foods/bulk`, payload);
+  }
+
+  async getRecipe(recipeId: string, restrictions: string[] = []) {
+    const url = `${prefix}/dietary/recipes/${recipeId}`;
+    return await this.requests.get<RecipeComplianceOut>(restrictions.length ? route(url, { restriction: restrictions }) : url);
   }
 
   async getToolFlags() {

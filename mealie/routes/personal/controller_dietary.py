@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from pydantic import UUID4
 
 from mealie.routes._base.base_controllers import BaseUserController
@@ -15,7 +15,9 @@ from mealie.schema.personal.dietary import (
     ToolRestrictionStatusCreate,
     ToolRestrictionStatusOut,
 )
+from mealie.schema.personal.meal_event import RecipeComplianceOut
 from mealie.services.personal.dietary_service import DietaryService
+from mealie.services.personal.recipe_compliance_service import RecipeComplianceService
 
 from ._base import run
 
@@ -65,6 +67,12 @@ class DietaryController(BaseUserController):
                 for food_id in data.food_ids
             ]
         )
+
+    @router.get("/recipes/{recipe_id}", response_model=RecipeComplianceOut)
+    def get_recipe_compliance(self, recipe_id: UUID4, restriction: list[str] | None = Query(None)):
+        """Check a recipe against the given restriction keys, or against the restrictions of the user."""
+        service = RecipeComplianceService(self.repos, self.user.id)
+        return run(lambda: service.check(recipe_id, restriction))
 
     @router.get("/tools", response_model=list[ToolRestrictionStatusOut])
     def get_tool_flags(self):

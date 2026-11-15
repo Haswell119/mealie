@@ -16,5 +16,11 @@
   "tools-help": "Un ustensile signalé apparaît dans la liste de contrôle quand une restriction couvre toute la préparation.",
   "tool": "Ustensile",
   "flag-tool": "Signaler un ustensile",
-  "no-tools": "Aucun ustensile signalé."
+  "no-tools": "Aucun ustensile signalé.",
+  "check-recipe-title": "Vérifier une recette",
+  "check-recipe-help": "Contrôle une recette par rapport à vos propres restrictions. Touchez un ingrédient pour le vérifier.",
+  "pick-recipe": "Choisir une recette",
+  "no-own-restrictions": "Créez d'abord votre fiche dans « Personnes », avec vos restrictions.",
+  "all-verified": "Tous les ingrédients sont vérifiés pour vos restrictions.",
+  "open-recipe": "Ouvrir la recette"
 }
