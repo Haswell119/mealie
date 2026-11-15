@@ -44,7 +44,7 @@
   "source": {
     "title": "Prix relevés en magasin",
     "disabled": "Le relevé automatique des prix n'est pas activé sur ce serveur. Les prix saisis à la main suffisent pour le budget.",
-    "help": "Cherchez un produit chez Coop, Migros, Aldi ou Lidl, puis gardez son prix pour un aliment. Seuls le texte recherché et les enseignes sont envoyés au service de prix.",
+    "help": "Cherchez un produit chez Coop, Migros, Aldi ou Lidl, puis gardez son prix pour un aliment. Seuls le texte recherché et les enseignes sont envoyés au service de prix. Les enseignes nomment leurs produits en allemand : « Milch », « Butter » ou « Kürbis » trouvent plus d'offres que le mot français.",
     "query": "Produit à chercher",
     "search": "Chercher les prix",
     "unavailable": "Le service de prix ne répond pas. Vos prix enregistrés restent utilisables.",

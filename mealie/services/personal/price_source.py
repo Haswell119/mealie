@@ -9,6 +9,7 @@ A request carries the search text and the names of the shops. It never carries a
 """
 
 import os
+import re
 from datetime import date, datetime
 from typing import Any
 
@@ -53,6 +54,16 @@ def _mapping(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+# Some shops give the price before the reduction only as a text: "Was: CHF 22.95".
+_FORMER_PRICE = re.compile(r"^\s*(?:was|statt|au lieu de)\s*:?\s*(?:chf|fr\.?)?\s*(\d+(?:[.,]\d{1,2})?)\s*$", re.I)
+
+
+def _former_price(text: str) -> float | None:
+    """The price before the reduction when the text states only that price, or else None."""
+    match = _FORMER_PRICE.match(text)
+    return _number(match.group(1).replace(",", ".")) if match else None
+
+
 def parse_offer(product: Any) -> PriceOffer | None:
     """Read one product of the price service. Return None when it has no name or no price."""
     if not isinstance(product, dict):
@@ -72,6 +83,10 @@ def parse_offer(product: Any) -> PriceOffer | None:
     unit_price = _mapping(product.get("unitPrice"))
     promotion = _mapping(product.get("promotion"))
     regular = _number(price.get("regular"))
+    description = str(promotion.get("description") or product.get("description") or "").strip()
+    if regular is None and (former := _former_price(description)) is not None:
+        # The text was the former price and nothing else: it is read as a price, not kept as a label.
+        regular, description = former, ""
 
     return PriceOffer(
         store=store,
@@ -87,7 +102,7 @@ def parse_offer(product: Any) -> PriceOffer | None:
         tags=[str(tag) for tag in product.get("tags") or [] if isinstance(tag, str)],
         image_url=_http_url(product.get("imageUrl")),
         product_url=_http_url(product.get("productUrl")),
-        promotion=str(promotion.get("description") or product.get("description") or "").strip() or None,
+        promotion=description or None,
         promotion_ends_on=_day(promotion.get("endsAt") or product.get("validUntil")),
     )
 
@@ -159,4 +174,8 @@ class PriceSource:
         result = self._call("get_product", {"chain": store, "id": external_id})
         if not isinstance(result, dict):
             return None
-        return parse_offer(result.get("product"))
+        offer = parse_offer(result.get("product"))
+        # A shop can answer an unknown id with another product. Its price must never replace the stored price.
+        if offer is None or offer.store != store or offer.external_id != external_id:
+            return None
+        return offer

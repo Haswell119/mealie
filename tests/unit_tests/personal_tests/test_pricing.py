@@ -163,6 +163,40 @@ def test_offer_parsing_keeps_only_what_is_sure():
     assert parse_offer({"chain": "coop", "id": "1", "name": "x", "price": {"current": 0}}) is None
 
 
+def test_a_former_price_given_as_text_is_read_as_the_regular_price():
+    def offer(description: str, regular: float | None = None):
+        price = {"current": 17.99} | ({"regular": regular} if regular else {})
+        product = {"chain": "aldi", "id": "1", "name": "Kaffee", "price": price}
+        return parse_offer(product | {"promotion": {"description": description}})
+
+    read = offer("Was: CHF 22.95")
+    assert read is not None and (read.regular_price, read.promotion) == (22.95, None)
+    comma = offer("statt 22,95")
+    assert comma is not None and (comma.regular_price, comma.promotion) == (22.95, None)
+
+    # a text that says more than a price stays a label; a price that is not above the price is no reduction
+    label = offer("-25% dès 2 pièces")
+    assert label is not None and (label.regular_price, label.promotion) == (None, "-25% dès 2 pièces")
+    lower = offer("Was: CHF 9.95")
+    assert lower is not None and (lower.regular_price, lower.promotion) == (None, None)
+
+    # the regular price of the shop wins over the text
+    both = offer("Was: CHF 30.00", regular=22.95)
+    assert both is not None and (both.regular_price, both.promotion) == (22.95, "Was: CHF 30.00")
+
+
+def test_a_product_with_another_id_is_not_the_product_asked_for(monkeypatch):
+    answer = {"chain": "migros", "id": "522205600000", "name": "Lactase", "price": {"current": 9.9}}
+    monkeypatch.setattr(PriceSource, "_call", lambda self, tool, arguments: {"product": answer})
+    source = PriceSource("http://price-bridge:8080")
+
+    found = source.product("migros", "522205600000")
+    assert found is not None and found.price == 9.9
+    # the shop answered an unknown id with another product
+    assert source.product("migros", "000000000000") is None
+    assert source.product("coop", "522205600000") is None
+
+
 def test_the_price_source_is_off_without_an_address(monkeypatch):
     monkeypatch.delenv("PE_PRICE_SOURCE_URL", raising=False)
     assert PriceSource().enabled is False

@@ -44,7 +44,7 @@
   "source": {
     "title": "Prices read from the shops",
     "disabled": "The automatic reading of prices is not enabled on this server. The prices typed by hand are enough for the budget.",
-    "help": "Search a product at Coop, Migros, Aldi or Lidl, then keep its price for a food. Only the search text and the shops go to the price service.",
+    "help": "Search a product at Coop, Migros, Aldi or Lidl, then keep its price for a food. Only the search text and the shops go to the price service. The shops name their products in German: \"Milch\", \"Butter\" or \"Kürbis\" find more offers than the English word.",
     "query": "Product to search",
     "search": "Search the prices",
     "unavailable": "The price service does not answer. Your stored prices stay usable.",
