@@ -87,7 +87,7 @@
       >
         <v-col
           cols="12"
-          sm="6"
+          sm="5"
         >
           <v-text-field
             v-model="query"
@@ -101,7 +101,7 @@
         </v-col>
         <v-col
           cols="7"
-          sm="3"
+          sm="4"
         >
           <v-select
             v-model="store"
