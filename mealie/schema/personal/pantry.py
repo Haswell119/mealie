@@ -7,6 +7,7 @@ from mealie.schema._mealie.mealie_model import MealieOutModel
 from mealie.schema.response.pagination import PaginationBase
 
 from .common import PersonalFoodSummary, PersonalUnitSummary
+from .enums import RetailStore
 
 
 class PantryItemCreate(MealieModel):
@@ -138,7 +139,7 @@ class ProductPagination(PaginationBase):
 
 class ProductSearchOut(MealieOutModel):
     query: str
-    store: str | None = None
+    store: RetailStore | None = None
     available: bool = True
     """False when the product database did not answer. The application works without it."""
     products: list[ProductBase] = []

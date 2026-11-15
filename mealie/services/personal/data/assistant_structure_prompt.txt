@@ -1,0 +1,3 @@
+Transforme la note suivante en brouillon de recette.
+Réponds uniquement avec un objet JSON : name, description, recipe_servings (nombre, 0 si inconnu), ingredients (liste de lignes « quantité unité ingrédient »), instructions (liste d'étapes), notes.
+N'invente pas de quantité absente de la note : écris l'ingrédient sans quantité et signale-le dans notes.

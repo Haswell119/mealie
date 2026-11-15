@@ -136,3 +136,12 @@ class AiProposalStatus(StrEnum):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
+
+
+class RetailStore(StrEnum):
+    """The shops whose products the application can look up."""
+
+    COOP = "coop"
+    MIGROS = "migros"
+    ALDI = "aldi"
+    LIDL = "lidl"

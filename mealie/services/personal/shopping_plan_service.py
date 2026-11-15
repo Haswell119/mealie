@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal
+from uuid import uuid4
 
 from pydantic import UUID4
 
@@ -376,6 +377,19 @@ class ShoppingPlanService:
         ledger, items = self._load(plan, plan.shopping_list_id)
         computation = self._compute(plan, ledger)
         steps = self._steps(plan, computation, ledger, items, restore_dismissed)
+        return ShoppingPlanPreviewOut(
+            plan=plan,
+            lines=[self._preview_line(step, computation) for step in steps],
+            issues=computation.issues,
+        )
+
+    def compute_adhoc(self, data: ShoppingPlanCreate) -> ShoppingPlanPreviewOut:
+        """Compute a plan that is not saved. Nothing is written: this serves a draft that waits for approval."""
+        self._check(data)
+        save = self._to_save(data)
+        plan = ShoppingPlanOut(id=uuid4(), **save.model_dump())
+        computation = self._compute(plan, {})
+        steps = self._steps(plan, computation, {}, {}, False)
         return ShoppingPlanPreviewOut(
             plan=plan,
             lines=[self._preview_line(step, computation) for step in steps],
