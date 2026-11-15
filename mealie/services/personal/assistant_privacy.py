@@ -10,6 +10,10 @@ from uuid import UUID
 
 PLACEHOLDER = "convive"
 
+# A profile named with one of these words is not a name. Replacing the word would garble ordinary
+# sentences ("propose-moi un menu") and would protect nothing.
+GENERIC_SELF_NAMES = frozenset({"moi", "me", "myself", "je", "i", "ich", "io", "yo"})
+
 
 class Anonymizer:
     """Replaces the names of persons with numbered placeholders, and puts the names back in a reply."""
@@ -26,7 +30,7 @@ class Anonymizer:
             self._labels[person_id] = label
             self._names_by_label[label] = name
             cleaned = name.strip()
-            if len(cleaned) >= 2:
+            if len(cleaned) >= 2 and cleaned.lower() not in GENERIC_SELF_NAMES:
                 self._patterns.append((re.compile(rf"(?<!\w){re.escape(cleaned)}(?!\w)", re.IGNORECASE), label))
 
     def label(self, person_id: UUID) -> str:

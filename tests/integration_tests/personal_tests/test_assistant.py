@@ -152,6 +152,17 @@ def test_anonymizer_replaces_and_restores_names():
     assert anonymizer.restore(f"Pour {anonymizer.label(sam)}, sans viande.") == "Pour Sam, sans viande."
 
 
+def test_a_profile_named_with_a_pronoun_does_not_garble_the_message():
+    from uuid import uuid4
+
+    me, sam = uuid4(), uuid4()
+    anonymizer = Anonymizer({me: "Moi", sam: "Sam"})
+
+    assert anonymizer.scrub("Propose-moi un menu pour Sam et moi") == (
+        f"Propose-moi un menu pour {anonymizer.label(sam)} et moi"
+    )
+
+
 def test_guest_names_and_notes_never_reach_the_provider(
     api_client: TestClient, unique_user: TestUser, provider: FakeProvider
 ):
