@@ -1,0 +1,115 @@
+{
+  "title": "Générer les courses",
+  "subtitle": "Un plan de courses calcule ce qu'il faut pour vos repas, retire le stock confirmé, arrondit aux conditionnements, puis écrit le résultat dans votre liste de courses habituelle — sans annuler vos achats ni vos modifications manuelles.",
+  "new-plan": "Nouveau plan de courses",
+  "empty": "Aucun plan de courses pour l'instant. Créez-en un à partir d'un événement, du planning de la semaine ou de quelques recettes.",
+  "open-plan": "Ouvrir le plan",
+  "source": {
+    "EVENT": "Événement",
+    "MEALPLAN": "Planning",
+    "RECIPES": "Recettes"
+  },
+  "source-help": {
+    "EVENT": "Les recettes et les portions viennent du menu et des invités de l'événement.",
+    "MEALPLAN": "Les recettes viennent du planning de repas, entre ces deux dates comprises.",
+    "RECIPES": "Choisissez des recettes. Le multiplicateur indique combien de fois préparer chacune."
+  },
+  "status": {
+    "OPEN": "En cours",
+    "DONE": "Terminé"
+  },
+  "computed-at": "Liste mise à jour le {date}",
+  "never-computed": "Pas encore envoyé dans une liste de courses",
+  "delete-confirm": "Supprimer le plan « {name} » ? La liste de courses déjà créée reste telle quelle.",
+  "form": {
+    "source-type": "Origine des recettes",
+    "name": "Nom du plan",
+    "event": "Événement",
+    "no-events": "Aucun événement pour l'instant. Choisissez « Planning » ou « Recettes », ou créez d'abord un événement.",
+    "date-from": "Du",
+    "date-to": "Au",
+    "dates-invalid": "La date de fin précède la date de début.",
+    "recipes": "Ajouter des recettes",
+    "recipes-selected": "Recettes choisies : {count}",
+    "no-recipes": "Aucune recette choisie.",
+    "scale": "Multiplicateur",
+    "remove-recipe": "Retirer la recette",
+    "use-stock": "Déduire le stock",
+    "use-stock-help": "Seul le stock marqué « utilisable confirmé » est déduit de ce qu'il faut acheter.",
+    "use-packaging": "Arrondir aux conditionnements",
+    "use-packaging-help": "La quantité à acheter est arrondie au nombre de paquets entiers supérieur.",
+    "target-list": "Liste de courses",
+    "new-list": "Nouvelle liste",
+    "target-list-help": "La liste n'est créée ou modifiée qu'au moment où vous mettez à jour les courses.",
+    "create": "Créer le plan"
+  },
+  "default-name": {
+    "generic": "Courses",
+    "EVENT": "Courses — {name}",
+    "MEALPLAN": "Courses du {from} au {to}",
+    "RECIPES": "Courses — {name}",
+    "RECIPES_MORE": "Courses — {name} + {count}"
+  },
+  "detail": {
+    "back": "Tous les plans",
+    "not-found": "Ce plan de courses est introuvable.",
+    "source-event": "Événement : {name}",
+    "source-mealplan": "Planning du {from} au {to}",
+    "source-recipes": "Recettes : {count}",
+    "computed-note": "Les quantités sont calculées par l'application à partir de vos recettes, de votre stock et de vos conditionnements. Aucune IA n'intervient dans ce calcul.",
+    "done-info": "Ce plan est terminé : le repas a été cuisiné et le stock a été diminué.",
+    "no-lines": "Ce plan ne demande aucun ingrédient pour l'instant.",
+    "lines-title": "Articles",
+    "need": "Besoin",
+    "in-stock": "En stock",
+    "to-buy": "À acheter",
+    "packs": "{count} × {label}",
+    "packs-plain": "Paquets : {count}",
+    "provenance": "Provenance",
+    "source-scale": "× {scale}",
+    "unnamed": "Article sans nom",
+    "purchased": "Déjà acheté : {quantity}",
+    "dismissed": "Supprimé de la liste par vous — ne sera pas recréé",
+    "dismissed-restore": "Supprimé de la liste par vous — sera recréé à la prochaine mise à jour",
+    "list-quantity": "Quantité dans la liste après mise à jour : {quantity}"
+  },
+  "warning": {
+    "UNIT_MISMATCH": "Stock présent dans une autre unité, non déduit"
+  },
+  "action": {
+    "CREATE": "Sera ajouté",
+    "UPDATE": "Sera mis à jour",
+    "DELETE": "Sera retiré"
+  },
+  "issue": {
+    "MISSING_SERVINGS": "Cette recette n'indique pas son nombre de portions",
+    "RECIPE_NOT_FOUND": "Recette introuvable",
+    "NO_VARIANT": "Aucun plat compatible pour cette personne",
+    "unknown": "Problème dans le plan ({code})"
+  },
+  "apply": {
+    "button": "Mettre à jour la liste de courses",
+    "restore-dismissed": "Recréer les articles supprimés",
+    "done-title": "Liste de courses mise à jour",
+    "done-summary": "Ajoutés : {created} · Mis à jour : {updated} · Retirés : {deleted}",
+    "open-list": "Ouvrir la liste de courses"
+  },
+  "receive": {
+    "button": "Ranger les achats dans le stock",
+    "help": "Les articles cochés dans la liste de courses entrent dans le stock. Chaque article n'est rangé qu'une fois.",
+    "done": "Articles rangés dans le stock : {received} · Déjà rangés : {skipped}",
+    "nothing": "Aucun article coché à ranger. Cochez d'abord vos achats dans la liste de courses."
+  },
+  "consume": {
+    "button": "Repas cuisiné : déduire du stock",
+    "confirm-title": "Repas cuisiné",
+    "confirm": "Le stock est diminué de ce que ce plan demandait, puis le plan est clôturé. Cette action ne peut pas être annulée.",
+    "done": "Plan clôturé. Aliments déduits du stock : {count}"
+  },
+  "edit": {
+    "button": "Modifier le plan",
+    "title": "Modifier le plan"
+  },
+  "recompute": "Recalculer",
+  "delete": "Supprimer le plan"
+}

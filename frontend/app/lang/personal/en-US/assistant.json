@@ -1,0 +1,112 @@
+{
+  "title": "AI assistant",
+  "subtitle": "Ask a question about your recipes, your stock or an event. The assistant suggests, you decide.",
+  "status-enabled": "Assistant active: {provider}, model {model}.",
+  "unknown-provider": "unnamed provider",
+  "unknown-model": "not specified",
+  "accept": "Accept",
+  "reject": "Reject",
+  "accepted": "The proposal is applied.",
+  "show-all": "Show all {count} lines",
+  "show-less": "Collapse the list",
+  "disabled": {
+    "title": "The assistant is not configured",
+    "text": "The assistant is optional: the whole application works without it. To turn it on, add an OpenAI-compatible provider, for example Infomaniak AI Tools, in the group settings.",
+    "settings": "Open the group settings"
+  },
+  "privacy": {
+    "title": "What the assistant sees and what it can do",
+    "guests": "The names and notes of your guests never leave the application: the assistant only sees “guest 1”, “guest 2”.",
+    "quantities": "Quantities are computed by the application, not by the assistant.",
+    "approval": "Nothing changes without your approval: the assistant makes proposals that you accept or reject."
+  },
+  "chat": {
+    "title": "Conversation",
+    "reset": "New conversation",
+    "empty": "Write your question or start from an example:",
+    "tools-used": "Functions used:",
+    "thinking": "The assistant is thinking…",
+    "event": "Related event (optional)",
+    "no-event": "No event yet",
+    "input": "Your message",
+    "input-hint": "Enter to send, Shift + Enter for a new line.",
+    "send": "Send"
+  },
+  "suggestions": {
+    "stock": "What can I cook with my stock?",
+    "menu": "Suggest a menu for my event",
+    "adapt": "Adapt this recipe to be gluten-free",
+    "shopping": "Prepare the shopping list"
+  },
+  "notice": {
+    "NOT_CONFIGURED": "The assistant cannot answer: no AI provider is configured. The rest of the application works as usual.",
+    "PROVIDER_ERROR": "The AI provider did not answer or returned an error. Try again in a moment; the rest of the application works as usual.",
+    "TOO_MANY_STEPS": "The assistant stopped before it finished, because the request needed too many steps. Try a more specific question.",
+    "EMPTY": "The assistant gave no answer. Rephrase your question.",
+    "REQUEST_FAILED": "The request failed. Check your connection, then try again."
+  },
+  "tools": {
+    "search_recipes": "Recipe search",
+    "get_recipe": "Recipe lookup",
+    "get_available_ingredients": "Stock lookup",
+    "get_event_guests": "Event guests",
+    "check_dietary_constraints": "Dietary check",
+    "calculate_portions": "Portion calculation",
+    "propose_recipe_variant": "Variant proposal",
+    "propose_menu": "Menu proposal",
+    "draft_shopping_list": "Shopping list draft"
+  },
+  "proposals": {
+    "title": "Proposals",
+    "pending": "{n} pending | {n} pending",
+    "help": "Accepting a proposal applies the change in the application. A replaced ingredient stays “to verify” until you verify it yourself.",
+    "empty": "No proposal yet."
+  },
+  "kind": {
+    "RECIPE_VARIANT": "Recipe variant",
+    "SUBSTITUTION": "Substitution",
+    "SHOPPING_LIST": "Shopping list",
+    "MENU": "Menu",
+    "RECIPE_DRAFT": "Recipe draft"
+  },
+  "status": {
+    "PENDING": "Pending",
+    "ACCEPTED": "Accepted",
+    "REJECTED": "Rejected"
+  },
+  "shopping": {
+    "empty": "Nothing to buy.",
+    "to-buy": "to buy: {quantity}",
+    "nothing-to-buy": "nothing to buy",
+    "needed": "Needed: {quantity}",
+    "from-stock": "in stock: {quantity}"
+  },
+  "variant": {
+    "of": "Original recipe: {recipe}"
+  },
+  "draft": {
+    "servings": "Servings: {count}",
+    "no-servings": "Number of servings not given",
+    "ingredients": "Ingredients",
+    "instructions": "Steps"
+  },
+  "accept-hint": {
+    "SHOPPING_LIST": "Accepting creates the shopping plan and adds these items to your shopping list.",
+    "RECIPE_VARIANT": "Accepting creates a new recipe; the original recipe does not change. A replaced ingredient stays “to verify” until you verify it.",
+    "SUBSTITUTION": "Accepting creates a new recipe; the original recipe does not change. A replaced ingredient stays “to verify” until you verify it.",
+    "MENU": "Accepting adds these dishes to the menu of the event. The dishes already on the menu stay.",
+    "RECIPE_DRAFT": "Accepting stores this draft on the inspiration. It is not a recipe yet: you check the quantities, then you validate."
+  },
+  "result": {
+    "shopping": "Shopping list updated: {created} added, {updated} changed.",
+    "menu": "{n} dish added to the menu. | {n} dishes added to the menu.",
+    "draft": "The draft is stored on the inspiration.",
+    "variant": "The new recipe is created.",
+    "unmatched": "These ingredients were not found in the recipe: {ingredients}. Edit the new recipe by hand.",
+    "open-plan": "View the shopping plan",
+    "open-shopping-list": "Open the shopping list",
+    "open-event": "Open the event",
+    "open-inspirations": "Open the inspiration",
+    "open-recipe": "Open the recipe"
+  }
+}

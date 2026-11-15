@@ -1,0 +1,82 @@
+{
+  "title": "Inspirations",
+  "subtitle": "An inspiration is an idea to keep: a link, a photo, a note. It is not a validated recipe yet. It becomes a draft, then a recipe when you validate it.",
+  "new": "New inspiration",
+  "search": "Filter by title",
+  "empty": "No inspiration yet. Write down an idea, paste a link or add a photo.",
+  "empty-filtered": "No inspiration matches these filters.",
+  "open-link": "Open the link in a new tab",
+  "delete": "Delete the inspiration",
+  "delete-confirm": "Delete “{title}” permanently?",
+  "delete-keeps-recipe": " The recipe created from this inspiration is kept.",
+  "filter": {
+    "ALL": "All",
+    "INSPIRATION": "Inspirations",
+    "DRAFT": "Drafts",
+    "VALIDATED": "Validated"
+  },
+  "status": {
+    "INSPIRATION": "Inspiration",
+    "DRAFT": "Draft",
+    "VALIDATED": "Validated recipe"
+  },
+  "kind": {
+    "LINK": "Link",
+    "PHOTO": "Photo",
+    "NOTE": "Note",
+    "VIDEO": "Video",
+    "IDEA": "Idea"
+  },
+  "field": {
+    "title": "Title",
+    "kind": "Type",
+    "url": "Link address",
+    "url-invalid": "The address must start with http:// or https://",
+    "text": "Note",
+    "tags": "Tags",
+    "tags-hint": "Type a tag, then press Enter."
+  },
+  "image": {
+    "title": "Image",
+    "choose": "Choose an image",
+    "add": "Add an image",
+    "replace": "Replace the image",
+    "help": "JPEG, PNG or WebP, 10 MB at most.",
+    "wrong-type": "Choose a JPEG, PNG or WebP image.",
+    "too-large": "The image is larger than 10 MB."
+  },
+  "draft": {
+    "title": "Recipe draft",
+    "start-help": "When you like the idea, turn it into a draft to write the recipe: name, servings, ingredients and steps.",
+    "start": "Start the draft",
+    "help": "Fill in the draft at your own pace. It becomes a recipe only when you validate it.",
+    "name": "Recipe name",
+    "description": "Description",
+    "servings": "Number of servings",
+    "servings-hint": "Required: the application uses it to scale the recipe to the number of guests.",
+    "ingredients": "Ingredients",
+    "ingredients-hint": "One ingredient per line, with its quantity and unit.",
+    "instructions": "Steps",
+    "instructions-hint": "One step per line.",
+    "notes": "Notes",
+    "check-quantities": "Before you validate, check every quantity, every unit and the number of servings yourself. The application then computes portions and shopping from these values.",
+    "missing": "To validate, the draft still needs:",
+    "missing-name": "the recipe name",
+    "missing-servings": "the number of servings",
+    "missing-ingredients": "at least one ingredient",
+    "validate": "Validate as a recipe"
+  },
+  "structure": {
+    "title": "AI assistant (optional)",
+    "help": "The assistant can suggest a draft from your note or your link. Nothing changes here: you accept or reject its proposal on the assistant page.",
+    "action": "Structure with the assistant",
+    "done": "A draft proposal is waiting for you on the assistant page. Read it, then accept or reject it.",
+    "open-assistant": "Open the assistant"
+  },
+  "validated": {
+    "text": "This inspiration is now a recipe. To change it, open the recipe.",
+    "open-recipe": "Open the recipe",
+    "recipe-missing": "The recipe no longer exists.",
+    "toast": "The recipe is created."
+  }
+}

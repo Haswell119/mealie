@@ -1,0 +1,115 @@
+{
+  "title": "Generate shopping",
+  "subtitle": "A shopping plan works out what your meals need, takes off the confirmed stock, rounds up to pack sizes, then writes the result to your normal shopping list — without undoing your purchases or your manual changes.",
+  "new-plan": "New shopping plan",
+  "empty": "No shopping plan yet. Create one from an event, from this week's meal plan or from a few recipes.",
+  "open-plan": "Open the plan",
+  "source": {
+    "EVENT": "Event",
+    "MEALPLAN": "Meal plan",
+    "RECIPES": "Recipes"
+  },
+  "source-help": {
+    "EVENT": "The recipes and portions come from the menu and the guests of the event.",
+    "MEALPLAN": "The recipes come from the meal planner, between these two dates included.",
+    "RECIPES": "Choose recipes. The multiplier says how many times to prepare each one."
+  },
+  "status": {
+    "OPEN": "Open",
+    "DONE": "Done"
+  },
+  "computed-at": "List updated on {date}",
+  "never-computed": "Not sent to a shopping list yet",
+  "delete-confirm": "Delete the plan \"{name}\"? The shopping list it created stays as it is.",
+  "form": {
+    "source-type": "Where the recipes come from",
+    "name": "Plan name",
+    "event": "Event",
+    "no-events": "No event yet. Choose \"Meal plan\" or \"Recipes\", or create an event first.",
+    "date-from": "From",
+    "date-to": "To",
+    "dates-invalid": "The end date is before the start date.",
+    "recipes": "Add recipes",
+    "recipes-selected": "Recipes chosen: {count}",
+    "no-recipes": "No recipe chosen.",
+    "scale": "Multiplier",
+    "remove-recipe": "Remove the recipe",
+    "use-stock": "Deduct the stock",
+    "use-stock-help": "Only stock marked \"confirmed usable\" is deducted from what you need to buy.",
+    "use-packaging": "Round up to pack sizes",
+    "use-packaging-help": "The quantity to buy is rounded up to a whole number of packs.",
+    "target-list": "Shopping list",
+    "new-list": "New list",
+    "target-list-help": "The list is only created or changed when you update the shopping.",
+    "create": "Create the plan"
+  },
+  "default-name": {
+    "generic": "Shopping",
+    "EVENT": "Shopping — {name}",
+    "MEALPLAN": "Shopping from {from} to {to}",
+    "RECIPES": "Shopping — {name}",
+    "RECIPES_MORE": "Shopping — {name} + {count}"
+  },
+  "detail": {
+    "back": "All plans",
+    "not-found": "This shopping plan was not found.",
+    "source-event": "Event: {name}",
+    "source-mealplan": "Meal plan from {from} to {to}",
+    "source-recipes": "Recipes: {count}",
+    "computed-note": "The quantities are computed by the application from your recipes, your stock and your pack sizes. No AI takes part in this calculation.",
+    "done-info": "This plan is done: the meal was cooked and the stock was reduced.",
+    "no-lines": "This plan needs no ingredient for now.",
+    "lines-title": "Items",
+    "need": "Needed",
+    "in-stock": "In stock",
+    "to-buy": "To buy",
+    "packs": "{count} × {label}",
+    "packs-plain": "Packs: {count}",
+    "provenance": "Where it comes from",
+    "source-scale": "× {scale}",
+    "unnamed": "Unnamed item",
+    "purchased": "Already bought: {quantity}",
+    "dismissed": "You deleted it from the list — it will not be created again",
+    "dismissed-restore": "You deleted it from the list — it will be created again at the next update",
+    "list-quantity": "Quantity in the list after the update: {quantity}"
+  },
+  "warning": {
+    "UNIT_MISMATCH": "Stock held in another unit, not deducted"
+  },
+  "action": {
+    "CREATE": "Will be added",
+    "UPDATE": "Will be updated",
+    "DELETE": "Will be removed"
+  },
+  "issue": {
+    "MISSING_SERVINGS": "This recipe does not state its number of servings",
+    "RECIPE_NOT_FOUND": "Recipe not found",
+    "NO_VARIANT": "No compatible dish for this person",
+    "unknown": "Problem in the plan ({code})"
+  },
+  "apply": {
+    "button": "Update the shopping list",
+    "restore-dismissed": "Create the deleted items again",
+    "done-title": "Shopping list updated",
+    "done-summary": "Added: {created} · Updated: {updated} · Removed: {deleted}",
+    "open-list": "Open the shopping list"
+  },
+  "receive": {
+    "button": "Put the purchases into stock",
+    "help": "The checked items of the shopping list go into the stock. Each item is put away only once.",
+    "done": "Items put into stock: {received} · Already put away: {skipped}",
+    "nothing": "No checked item to put away. Check your purchases in the shopping list first."
+  },
+  "consume": {
+    "button": "Meal cooked: deduct from stock",
+    "confirm-title": "Meal cooked",
+    "confirm": "The stock is reduced by what this plan needed, then the plan is closed. This cannot be undone.",
+    "done": "Plan closed. Foods deducted from stock: {count}"
+  },
+  "edit": {
+    "button": "Edit the plan",
+    "title": "Edit the plan"
+  },
+  "recompute": "Recompute",
+  "delete": "Delete the plan"
+}

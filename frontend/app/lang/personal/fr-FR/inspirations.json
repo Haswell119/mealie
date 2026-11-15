@@ -1,0 +1,82 @@
+{
+  "title": "Inspirations",
+  "subtitle": "Une inspiration est une idée à garder : un lien, une photo, une note. Ce n'est pas encore une recette validée. Elle devient un brouillon, puis une recette quand vous la validez.",
+  "new": "Nouvelle inspiration",
+  "search": "Filtrer par titre",
+  "empty": "Aucune inspiration pour l'instant. Notez une idée, collez un lien ou ajoutez une photo.",
+  "empty-filtered": "Aucune inspiration ne correspond à ces filtres.",
+  "open-link": "Ouvrir le lien dans un nouvel onglet",
+  "delete": "Supprimer l'inspiration",
+  "delete-confirm": "Supprimer définitivement « {title} » ?",
+  "delete-keeps-recipe": " La recette créée à partir de cette inspiration est conservée.",
+  "filter": {
+    "ALL": "Toutes",
+    "INSPIRATION": "Inspirations",
+    "DRAFT": "Brouillons",
+    "VALIDATED": "Validées"
+  },
+  "status": {
+    "INSPIRATION": "Inspiration",
+    "DRAFT": "Brouillon",
+    "VALIDATED": "Recette validée"
+  },
+  "kind": {
+    "LINK": "Lien",
+    "PHOTO": "Photo",
+    "NOTE": "Note",
+    "VIDEO": "Vidéo",
+    "IDEA": "Idée"
+  },
+  "field": {
+    "title": "Titre",
+    "kind": "Type",
+    "url": "Adresse du lien",
+    "url-invalid": "L'adresse doit commencer par http:// ou https://",
+    "text": "Note",
+    "tags": "Étiquettes",
+    "tags-hint": "Tapez une étiquette, puis Entrée."
+  },
+  "image": {
+    "title": "Image",
+    "choose": "Choisir une image",
+    "add": "Ajouter une image",
+    "replace": "Remplacer l'image",
+    "help": "JPEG, PNG ou WebP, 10 Mo au maximum.",
+    "wrong-type": "Choisissez une image JPEG, PNG ou WebP.",
+    "too-large": "L'image dépasse 10 Mo."
+  },
+  "draft": {
+    "title": "Brouillon de recette",
+    "start-help": "Quand l'idée vous plaît, passez-la en brouillon pour écrire la recette : nom, portions, ingrédients et étapes.",
+    "start": "Passer en brouillon",
+    "help": "Complétez le brouillon à votre rythme. Il ne devient une recette que lorsque vous le validez.",
+    "name": "Nom de la recette",
+    "description": "Description",
+    "servings": "Nombre de portions",
+    "servings-hint": "Obligatoire : l'application s'en sert pour adapter la recette au nombre de convives.",
+    "ingredients": "Ingrédients",
+    "ingredients-hint": "Un ingrédient par ligne, avec sa quantité et son unité.",
+    "instructions": "Étapes",
+    "instructions-hint": "Une étape par ligne.",
+    "notes": "Remarques",
+    "check-quantities": "Avant de valider, vérifiez vous-même chaque quantité, chaque unité et le nombre de portions. L'application calcule ensuite les portions et les courses à partir de ces valeurs.",
+    "missing": "Pour valider, il manque encore :",
+    "missing-name": "le nom de la recette",
+    "missing-servings": "le nombre de portions",
+    "missing-ingredients": "au moins un ingrédient",
+    "validate": "Valider en recette"
+  },
+  "structure": {
+    "title": "Assistant IA (facultatif)",
+    "help": "L'assistant peut proposer un brouillon à partir de votre note ou de votre lien. Rien n'est modifié ici : vous acceptez ou refusez sa proposition sur la page de l'assistant.",
+    "action": "Structurer avec l'assistant",
+    "done": "Une proposition de brouillon vous attend sur la page de l'assistant. Relisez-la, puis acceptez-la ou refusez-la.",
+    "open-assistant": "Ouvrir l'assistant"
+  },
+  "validated": {
+    "text": "Cette inspiration est devenue une recette. Pour la modifier, ouvrez la recette.",
+    "open-recipe": "Ouvrir la recette",
+    "recipe-missing": "La recette n'existe plus.",
+    "toast": "La recette est créée."
+  }
+}

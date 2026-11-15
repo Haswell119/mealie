@@ -1,0 +1,112 @@
+{
+  "title": "Assistant IA",
+  "subtitle": "Posez une question sur vos recettes, votre stock ou un événement. L'assistant propose, vous décidez.",
+  "status-enabled": "Assistant actif : {provider}, modèle {model}.",
+  "unknown-provider": "fournisseur sans nom",
+  "unknown-model": "non précisé",
+  "accept": "Accepter",
+  "reject": "Refuser",
+  "accepted": "La proposition est appliquée.",
+  "show-all": "Afficher les {count} lignes",
+  "show-less": "Réduire la liste",
+  "disabled": {
+    "title": "L'assistant n'est pas configuré",
+    "text": "L'assistant est facultatif : toute l'application fonctionne sans lui. Pour l'activer, ajoutez un fournisseur compatible avec OpenAI, par exemple Infomaniak AI Tools, dans les paramètres du groupe.",
+    "settings": "Ouvrir les paramètres du groupe"
+  },
+  "privacy": {
+    "title": "Ce que l'assistant voit et ce qu'il peut faire",
+    "guests": "Les noms et les remarques de vos convives ne quittent jamais l'application : l'assistant voit seulement « convive 1 », « convive 2 ».",
+    "quantities": "Les quantités sont calculées par l'application, pas par l'assistant.",
+    "approval": "Rien ne change sans votre accord : l'assistant fait des propositions, que vous acceptez ou refusez."
+  },
+  "chat": {
+    "title": "Conversation",
+    "reset": "Nouvelle conversation",
+    "empty": "Écrivez votre question ou partez d'un exemple :",
+    "tools-used": "Fonctions utilisées :",
+    "thinking": "L'assistant réfléchit…",
+    "event": "Événement concerné (facultatif)",
+    "no-event": "Aucun événement enregistré",
+    "input": "Votre message",
+    "input-hint": "Entrée pour envoyer, Maj + Entrée pour aller à la ligne.",
+    "send": "Envoyer"
+  },
+  "suggestions": {
+    "stock": "Que puis-je cuisiner avec mon stock ?",
+    "menu": "Propose un menu pour mon événement",
+    "adapt": "Adapte cette recette sans gluten",
+    "shopping": "Prépare la liste de courses"
+  },
+  "notice": {
+    "NOT_CONFIGURED": "L'assistant ne peut pas répondre : aucun fournisseur d'IA n'est configuré. Le reste de l'application fonctionne normalement.",
+    "PROVIDER_ERROR": "Le fournisseur d'IA n'a pas répondu ou a renvoyé une erreur. Réessayez dans un instant ; le reste de l'application fonctionne normalement.",
+    "TOO_MANY_STEPS": "L'assistant s'est arrêté avant de conclure, car la demande demandait trop d'étapes. Essayez une question plus précise.",
+    "EMPTY": "L'assistant n'a rien répondu. Reformulez votre question.",
+    "REQUEST_FAILED": "La demande n'a pas abouti. Vérifiez votre connexion, puis réessayez."
+  },
+  "tools": {
+    "search_recipes": "Recherche de recettes",
+    "get_recipe": "Lecture d'une recette",
+    "get_available_ingredients": "Lecture du stock",
+    "get_event_guests": "Convives de l'événement",
+    "check_dietary_constraints": "Contrôle des restrictions",
+    "calculate_portions": "Calcul des portions",
+    "propose_recipe_variant": "Proposition de variante",
+    "propose_menu": "Proposition de menu",
+    "draft_shopping_list": "Brouillon de liste de courses"
+  },
+  "proposals": {
+    "title": "Propositions",
+    "pending": "{n} en attente | {n} en attente",
+    "help": "Accepter une proposition applique le changement dans l'application. Un ingrédient remplacé reste « à vérifier » tant que vous ne l'avez pas vérifié vous-même.",
+    "empty": "Aucune proposition pour l'instant."
+  },
+  "kind": {
+    "RECIPE_VARIANT": "Variante de recette",
+    "SUBSTITUTION": "Substitution",
+    "SHOPPING_LIST": "Liste de courses",
+    "MENU": "Menu",
+    "RECIPE_DRAFT": "Brouillon de recette"
+  },
+  "status": {
+    "PENDING": "En attente",
+    "ACCEPTED": "Acceptée",
+    "REJECTED": "Refusée"
+  },
+  "shopping": {
+    "empty": "Aucun article à acheter.",
+    "to-buy": "à acheter : {quantity}",
+    "nothing-to-buy": "rien à acheter",
+    "needed": "Besoin : {quantity}",
+    "from-stock": "en stock : {quantity}"
+  },
+  "variant": {
+    "of": "Recette d'origine : {recipe}"
+  },
+  "draft": {
+    "servings": "Portions : {count}",
+    "no-servings": "Nombre de portions non indiqué",
+    "ingredients": "Ingrédients",
+    "instructions": "Étapes"
+  },
+  "accept-hint": {
+    "SHOPPING_LIST": "Accepter crée le plan de courses et ajoute ces articles à votre liste de courses.",
+    "RECIPE_VARIANT": "Accepter crée une nouvelle recette ; la recette d'origine ne change pas. Un ingrédient remplacé reste « à vérifier » tant que vous ne l'avez pas vérifié.",
+    "SUBSTITUTION": "Accepter crée une nouvelle recette ; la recette d'origine ne change pas. Un ingrédient remplacé reste « à vérifier » tant que vous ne l'avez pas vérifié.",
+    "MENU": "Accepter ajoute ces plats au menu de l'événement. Les plats déjà au menu restent en place.",
+    "RECIPE_DRAFT": "Accepter enregistre ce brouillon sur l'inspiration. Ce n'est pas encore une recette : vous vérifiez les quantités, puis vous validez."
+  },
+  "result": {
+    "shopping": "Liste de courses mise à jour : {created} ajouté(s), {updated} modifié(s).",
+    "menu": "{n} plat ajouté au menu. | {n} plats ajoutés au menu.",
+    "draft": "Le brouillon est enregistré sur l'inspiration.",
+    "variant": "La nouvelle recette est créée.",
+    "unmatched": "Ces ingrédients n'ont pas été trouvés dans la recette : {ingredients}. Modifiez la nouvelle recette à la main.",
+    "open-plan": "Voir le plan de courses",
+    "open-shopping-list": "Ouvrir la liste de courses",
+    "open-event": "Ouvrir l'événement",
+    "open-inspirations": "Ouvrir l'inspiration",
+    "open-recipe": "Ouvrir la recette"
+  }
+}
