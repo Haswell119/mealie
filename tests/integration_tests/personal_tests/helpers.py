@@ -5,7 +5,13 @@ from uuid import UUID
 from fastapi.testclient import TestClient
 
 from mealie.schema.recipe.recipe import RecipeDraft, RecipeOut
-from mealie.schema.recipe.recipe_ingredient import IngredientFoodOut, IngredientUnitOut, RecipeIngredient
+from mealie.schema.recipe.recipe_ingredient import (
+    IngredientFoodOut,
+    IngredientFoodSave,
+    IngredientUnitOut,
+    IngredientUnitSave,
+    RecipeIngredient,
+)
 from tests.utils.factories import random_string
 from tests.utils.fixture_schemas import TestUser
 
@@ -26,19 +32,21 @@ def create_person(api_client: TestClient, user: TestUser, name: str | None = Non
 
 
 def create_food(user: TestUser, name: str | None = None) -> IngredientFoodOut:
-    return user.repos.ingredient_foods.create({"name": name or random_string(), "group_id": UUID(user.group_id)})
+    return user.repos.ingredient_foods.create(
+        IngredientFoodSave(name=name or random_string(), group_id=UUID(user.group_id))
+    )
 
 
 def create_unit(
     user: TestUser, name: str | None = None, standard_quantity: float | None = None, standard_unit: str | None = None
 ) -> IngredientUnitOut:
     return user.repos.ingredient_units.create(
-        {
-            "name": name or random_string(),
-            "group_id": UUID(user.group_id),
-            "standard_quantity": standard_quantity,
-            "standard_unit": standard_unit,
-        }
+        IngredientUnitSave(
+            name=name or random_string(),
+            group_id=UUID(user.group_id),
+            standard_quantity=standard_quantity,
+            standard_unit=standard_unit,
+        )
     )
 
 

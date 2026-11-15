@@ -50,6 +50,8 @@ class MealEventGuestOut(MealieOutModel):
 
 
 class MealEventVariantCreate(MealieModel):
+    id: UUID4 | None = None
+    """The id of an existing variant to keep. None creates a variant."""
     recipe_id: UUID4
     label: str | None = None
     portions_override: float | None = Field(None, ge=0)
@@ -66,6 +68,8 @@ class MealEventVariantOut(MealieOutModel):
 
 
 class MealEventMenuItemCreate(MealieModel):
+    id: UUID4 | None = None
+    """The id of an existing menu item to keep. None creates a menu item."""
     course: MealCourse = MealCourse.MAIN
     title: str | None = None
     variants: list[MealEventVariantCreate] = []

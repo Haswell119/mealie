@@ -1,8 +1,11 @@
+from datetime import date
 from functools import cached_property
 from typing import TYPE_CHECKING
 
+import sqlalchemy as sa
 from pydantic import UUID4
 
+from mealie.db.models.household.mealplan import GroupMealPlan
 from mealie.db.models.personal import (
     PeAiProposal,
     PeDietaryRestriction,
@@ -167,3 +170,22 @@ class PersonalRepositories:
     @cached_property
     def pe_ai_proposals(self) -> HouseholdRepositoryGeneric[AiProposalOut, PeAiProposal]:
         return self._pe_household(PeAiProposal, AiProposalOut)
+
+    # ================================================================
+    # Read helpers on native tables
+
+    def pe_mealplan_entries_between(self, date_from: date, date_to: date) -> list[GroupMealPlan]:
+        """The meal plan entries of the household that fall in a range of days, week entries included."""
+        end = sa.func.coalesce(GroupMealPlan.end_date, GroupMealPlan.date)
+        stmt = (
+            sa.select(GroupMealPlan)
+            .where(
+                GroupMealPlan.group_id == self.group_id,
+                GroupMealPlan.household_id == self.household_id,
+                GroupMealPlan.recipe_id.is_not(None),
+                GroupMealPlan.date <= date_to,
+                end >= date_from,
+            )
+            .order_by(GroupMealPlan.date)
+        )
+        return list(self.session.execute(stmt).scalars().all())
