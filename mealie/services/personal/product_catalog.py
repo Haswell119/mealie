@@ -17,6 +17,8 @@ from mealie.schema.personal.pantry import ProductBase
 logger = get_logger()
 
 BASE_URL = "https://world.openfoodfacts.org"
+# The text search of the main site times out. The search engine of the same project answers at once.
+SEARCH_URL = "https://search.openfoodfacts.org"
 USER_AGENT = "recipe-manager/1.0"
 TIMEOUT_SECONDS = 12
 PAGE_SIZE = 24
@@ -31,6 +33,7 @@ FIELDS = ",".join(
         "quantity",
         "product_quantity",
         "product_quantity_unit",
+        "stores",
         "stores_tags",
         "labels_tags",
         "allergens_tags",
@@ -50,6 +53,13 @@ _UNIT_TO_BASE: dict[str, tuple[str, float]] = {
 }
 
 
+def _search_text(query: str) -> str:
+    """The words of a search without the characters that the query language of the search engine reads."""
+    text = re.sub(r"[^\w\s'’.,%-]+", " ", query)
+    text = re.sub(r"\b(AND|OR|NOT|TO)\b", lambda match: match.group().lower(), text)
+    return " ".join(text.split())
+
+
 class ProductCatalogUnavailable(Exception):
     """The product database did not answer, or its answer could not be read."""
 
@@ -58,6 +68,23 @@ def _strip_tags(tags: Any) -> list[str]:
     if not isinstance(tags, list):
         return []
     return [str(tag).split(":", 1)[-1] for tag in tags if tag]
+
+
+def _text_list(value: Any) -> list[str]:
+    """A field that one endpoint gives as a list and the other as text with commas."""
+    parts = value if isinstance(value, list) else str(value or "").split(",")
+    return [str(part).strip() for part in parts if str(part).strip()]
+
+
+def _stores(product: dict[str, Any]) -> list[str]:
+    """The shops of a product, as lower case keys without a duplicate."""
+    names = _strip_tags(product.get("stores_tags")) or _text_list(product.get("stores"))
+    keys: list[str] = []
+    for name in names:
+        key = re.sub(r"\s+", "-", name.strip().lower())
+        if key and key not in keys:
+            keys.append(key)
+    return keys
 
 
 def parse_quantity(product: dict[str, Any]) -> tuple[float | None, str | None]:
@@ -90,12 +117,12 @@ def parse_product(product: dict[str, Any]) -> ProductBase | None:
         return None
 
     quantity, quantity_unit = parse_quantity(product)
-    brands = [brand.strip() for brand in str(product.get("brands") or "").split(",") if brand.strip()]
+    brands = _text_list(product.get("brands"))
     return ProductBase(
         barcode=barcode,
         name=name,
         brand=brands[0] if brands else None,
-        stores=_strip_tags(product.get("stores_tags")),
+        stores=_stores(product),
         quantity=quantity,
         quantity_unit=quantity_unit,
         quantity_text=str(product.get("quantity") or "") or None,
@@ -109,12 +136,12 @@ def parse_product(product: dict[str, Any]) -> ProductBase | None:
 
 
 class OpenFoodFactsClient:
-    def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
+    def _get(self, path: str, params: dict[str, Any], base_url: str = BASE_URL) -> dict[str, Any]:
         try:
             transport = safehttp.SafeTransport(timeout=TIMEOUT_SECONDS)
             with httpx.Client(transport=transport, follow_redirects=True) as client:
                 response = client.get(
-                    f"{BASE_URL}{path}",
+                    f"{base_url}{path}",
                     params=params,
                     timeout=TIMEOUT_SECONDS,
                     headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
@@ -130,21 +157,21 @@ class OpenFoodFactsClient:
         return data
 
     def search(self, query: str, store: RetailStore | None = None) -> list[ProductBase]:
-        """Products sold in Switzerland that match a text, limited to one shop when a shop is given."""
-        params: dict[str, Any] = {
-            "search_terms": query,
-            "json": 1,
-            "page_size": PAGE_SIZE,
-            "fields": FIELDS,
-            "tagtype_0": "countries",
-            "tag_contains_0": "contains",
-            "tag_0": COUNTRY,
-        }
-        if store is not None:
-            params.update(tagtype_1="stores", tag_contains_1="contains", tag_1=store.value)
+        """
+        Products sold in Switzerland that match a text, in one shop or in any of the shops of the application.
 
-        data = self._get("/cgi/search.pl", params)
-        products = [parse_product(product) for product in data.get("products") or [] if isinstance(product, dict)]
+        One request serves every shop: an open search also returns the products of other chains.
+        """
+        wanted = [store] if store is not None else list(RetailStore)
+        shops = " OR ".join(f'"{shop.value}"' for shop in wanted)
+        params: dict[str, Any] = {
+            "q": f'{_search_text(query)} countries_tags:"en:{COUNTRY}" stores:({shops})',
+            "page_size": PAGE_SIZE,
+            "langs": "fr,de,it,en",
+            "fields": FIELDS,
+        }
+        data = self._get("/search", params, SEARCH_URL)
+        products = [parse_product(product) for product in data.get("hits") or [] if isinstance(product, dict)]
         return [product for product in products if product is not None]
 
     def lookup(self, barcode: str) -> ProductBase | None:

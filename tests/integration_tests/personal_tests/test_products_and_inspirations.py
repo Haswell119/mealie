@@ -36,14 +36,18 @@ def catalog(monkeypatch: pytest.MonkeyPatch):
     calls: list[tuple[str, dict]] = []
     state = {"fail": False}
 
-    def fake_get(self, path: str, params: dict) -> dict:
-        calls.append((path, params))
+    def fake_get(self, path: str, params: dict, base_url: str = product_catalog.BASE_URL) -> dict:
+        calls.append((base_url + path, params))
         if state["fail"]:
             raise ProductCatalogUnavailable()
         if path.startswith("/api/v2/product/"):
             barcode = path.split("/")[-1].removesuffix(".json")
             return {"product": GF_BUN} if barcode == GF_BUN["code"] else {"status": 0}
-        return {"products": [GF_BUN, {"code": "", "product_name": "sans code"}, {"code": "123", "product_name": ""}]}
+        # the search engine gives the brands and the shops as lists of plain text
+        found = {**GF_BUN, "brands": ["aha!", " Migros"], "stores": ["Migros", " migros"]}
+        del found["stores_tags"], found["product_quantity"], found["product_quantity_unit"]
+        found["quantity"] = "300 g"
+        return {"hits": [found, {"code": "", "product_name": "sans code"}, {"code": "123", "product_name": ""}]}
 
     monkeypatch.setattr(OpenFoodFactsClient, "_get", fake_get)
     return calls, state
@@ -74,12 +78,10 @@ def test_product_search_is_limited_to_switzerland_and_a_shop(api_client: TestCli
     assert product["labels"] == ["no-gluten", "vegetarian"]
     assert product["stores"] == ["migros"]
 
-    path, params = calls[0]
-    assert path == "/cgi/search.pl"
-    assert params["tag_0"] == "switzerland"
-    assert params["tag_1"] == "migros"
-    # the request carries the search text and nothing about the user
-    assert params["search_terms"] == "pain burger"
+    url, params = calls[0]
+    assert url == "https://search.openfoodfacts.org/search"
+    # the request carries the search text, the country and the shop, and nothing about the user
+    assert params["q"] == 'pain burger countries_tags:"en:switzerland" stores:("migros")'
     assert unique_user.email not in str(params) and unique_user.username not in str(params)
 
     for store in ("coop", "aldi", "lidl"):
@@ -89,14 +91,28 @@ def test_product_search_is_limited_to_switzerland_and_a_shop(api_client: TestCli
     assert bad.status_code == 422
 
 
-def test_search_without_a_shop_asks_each_of_the_four_shops(api_client: TestClient, unique_user: TestUser, catalog):
+def test_search_without_a_shop_asks_the_four_shops_in_one_request(
+    api_client: TestClient, unique_user: TestUser, catalog
+):
     calls, _ = catalog
     response = api_client.get(f"{PRODUCTS}/search", params={"query": "pain burger"}, headers=unique_user.token)
     assert response.status_code == 200, response.text
 
-    assert sorted(params["tag_1"] for _, params in calls) == ["aldi", "coop", "lidl", "migros"]
-    # the same product found in several shops is listed once
+    assert len(calls) == 1
+    assert calls[0][1]["q"].endswith('stores:("coop" OR "migros" OR "aldi" OR "lidl")')
     assert [product["barcode"] for product in response.json()["products"]] == [GF_BUN["code"]]
+
+
+def test_search_text_cannot_change_the_query(api_client: TestClient, unique_user: TestUser, catalog):
+    calls, _ = catalog
+    text = 'lait) OR countries_tags:"en:france" (x'
+    response = api_client.get(f"{PRODUCTS}/search", params={"query": text}, headers=unique_user.token)
+    assert response.status_code == 200, response.text
+
+    query = calls[0][1]["q"]
+    assert query.startswith("lait or countries_tags en france x ")
+    assert query.count("(") == 1 and query.count(":") == 3
+    assert 'countries_tags:"en:switzerland"' in query
 
 
 def test_product_search_reports_an_unavailable_database(api_client: TestClient, unique_user: TestUser, catalog):

@@ -57,21 +57,14 @@ class ProductService:
         query = query.strip()
         if len(query) < 2:
             raise PersonalError("QUERY_TOO_SHORT", "Type at least two characters.")
-        # Without a shop, search each of the four shops: an open search also returns products of other chains.
-        stores = [store] if store is not None else list(RetailStore)
-        products: dict[str, ProductBase] = {}
-        answered = False
-        for wanted in stores:
-            try:
-                found = self.client.search(query, wanted)
-            except ProductCatalogUnavailable:
-                continue
-            answered = True
-            for product in found:
-                products.setdefault(product.barcode, product)
-
-        if not answered:
+        try:
+            found = self.client.search(query, store)
+        except ProductCatalogUnavailable:
             return ProductSearchOut(query=query, store=store, available=False)
+
+        products: dict[str, ProductBase] = {}
+        for product in found:
+            products.setdefault(product.barcode, product)
         return ProductSearchOut(query=query, store=store, products=list(products.values()))
 
     def get_one(self, product_id: UUID4) -> ProductOut:
