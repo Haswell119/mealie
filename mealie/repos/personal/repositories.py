@@ -28,6 +28,7 @@ from mealie.db.models.personal import (
     PeShoppingPlanLine,
     PeToolRestrictionStatus,
 )
+from mealie.db.models.recipe.ingredient import households_to_ingredient_foods
 from mealie.schema.personal.assistant import AiProposalOut
 from mealie.schema.personal.dietary import (
     DietaryRestrictionOut,
@@ -189,3 +190,19 @@ class PersonalRepositories:
             .order_by(GroupMealPlan.date)
         )
         return list(self.session.execute(stmt).scalars().all())
+
+    def pe_set_food_on_hand(self, food_id: UUID4, on_hand: bool) -> None:
+        """
+        Set the native "on hand" flag of a food for the household.
+
+        The native recipe finder and the native shopping list read this flag, so the pantry keeps it current.
+        """
+        table = households_to_ingredient_foods
+        match = sa.and_(table.c.household_id == self.household_id, table.c.food_id == food_id)
+        exists = self.session.execute(sa.select(table.c.food_id).where(match)).first() is not None
+
+        if on_hand and not exists:
+            self.session.execute(sa.insert(table).values(household_id=self.household_id, food_id=food_id))
+        elif not on_hand and exists:
+            self.session.execute(sa.delete(table).where(match))
+        self.session.commit()

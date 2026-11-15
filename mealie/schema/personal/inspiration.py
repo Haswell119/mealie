@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import UUID4, ConfigDict, model_validator
+from pydantic import UUID4, ConfigDict, field_validator, model_validator
 
 from mealie.schema._mealie import MealieModel
 from mealie.schema._mealie.mealie_model import MealieOutModel
@@ -66,12 +66,10 @@ class InspirationOut(MealieOutModel):
     created_at: datetime | None = None
     model_config = ConfigDict(from_attributes=True)
 
-    @model_validator(mode="before")
+    @field_validator("tags", mode="before")
     @classmethod
-    def none_tags_to_empty(cls, data):
-        if isinstance(data, dict) and data.get("tags") is None:
-            data["tags"] = []
-        return data
+    def none_tags_to_empty(cls, value):
+        return [] if value is None else value
 
 
 class InspirationPagination(PaginationBase):

@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import UUID4, ConfigDict, Field, model_validator
+from pydantic import UUID4, ConfigDict, Field, field_validator, model_validator
 
 from mealie.schema._mealie import MealieModel
 from mealie.schema._mealie.mealie_model import MealieOutModel
@@ -93,14 +93,10 @@ class ShoppingPlanLineOut(MealieOutModel):
     checks: list[ShoppingPlanCheckOut] = []
     model_config = ConfigDict(from_attributes=True)
 
-    @model_validator(mode="before")
+    @field_validator("sources", "checks", mode="before")
     @classmethod
-    def none_lists_to_empty(cls, data):
-        if isinstance(data, dict):
-            for field in ("sources", "checks"):
-                if data.get(field) is None:
-                    data[field] = []
-        return data
+    def none_lists_to_empty(cls, value):
+        return [] if value is None else value
 
 
 class ShoppingPlanOut(MealieOutModel):
@@ -121,12 +117,10 @@ class ShoppingPlanOut(MealieOutModel):
     created_at: datetime | None = None
     model_config = ConfigDict(from_attributes=True)
 
-    @model_validator(mode="before")
+    @field_validator("recipes", mode="before")
     @classmethod
-    def none_recipes_to_empty(cls, data):
-        if isinstance(data, dict) and data.get("recipes") is None:
-            data["recipes"] = []
-        return data
+    def none_recipes_to_empty(cls, value):
+        return [] if value is None else value
 
 
 class ShoppingPlanPagination(PaginationBase):

@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import UUID4, ConfigDict, Field, model_validator
+from pydantic import UUID4, ConfigDict, Field, field_validator
 
 from mealie.schema._mealie import MealieModel
 from mealie.schema._mealie.mealie_model import MealieOutModel
@@ -112,14 +112,10 @@ class ProductBase(MealieModel):
     source: str = "openfoodfacts"
     source_url: str | None = None
 
-    @model_validator(mode="before")
+    @field_validator("stores", "labels", "allergens", "traces", mode="before")
     @classmethod
-    def none_lists_to_empty(cls, data):
-        if isinstance(data, dict):
-            for field in ("stores", "labels", "allergens", "traces"):
-                if data.get(field) is None:
-                    data[field] = []
-        return data
+    def none_lists_to_empty(cls, value):
+        return [] if value is None else value
 
 
 class ProductSave(ProductBase):
