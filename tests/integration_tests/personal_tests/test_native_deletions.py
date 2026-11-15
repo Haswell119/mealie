@@ -5,11 +5,21 @@ PostgreSQL enforces foreign keys and SQLite does not, so the checks on what the 
 only run on PostgreSQL. The native call must succeed on both.
 """
 
+from uuid import UUID
+
 import pytest
 from fastapi.testclient import TestClient
 
 from mealie.core.config import get_app_settings
+from mealie.repos.all_repositories import get_repositories
+from mealie.schema.household.household import HouseholdCreate
+from mealie.schema.personal.pantry import PantryItemCreate
+from mealie.schema.personal.person import PersonCreate
+from mealie.services.household_services.household_service import HouseholdService
+from mealie.services.personal.pantry_service import PantryService
+from mealie.services.personal.person_service import PersonService
 from tests.utils import api_routes
+from tests.utils.factories import random_string
 from tests.utils.fixture_schemas import TestUser
 
 from .helpers import (
@@ -127,3 +137,35 @@ def test_native_food_merge_still_works(api_client: TestClient, unique_user: Test
         api_routes.foods_merge, json={"fromFood": str(merged.id), "toFood": str(kept.id)}, headers=unique_user.token
     )
     assert response.status_code == 200, response.text
+
+
+def test_household_with_personal_data_can_be_deleted(api_client: TestClient, unique_user: TestUser):
+    session = unique_user.repos.session
+    group_repos = get_repositories(session, group_id=UUID(unique_user.group_id), household_id=None)
+    household = HouseholdService.create_household(group_repos, HouseholdCreate(name=random_string()))
+    scoped = get_repositories(session, group_id=UUID(unique_user.group_id), household_id=household.id)
+
+    person = PersonService(scoped).create(PersonCreate(display_name="Invité", consent_given=True), unique_user.user_id)
+    food = create_food(unique_user)
+    stock = PantryService(scoped).create(PantryItemCreate(food_id=food.id, quantity=1))
+    event = scoped.pe_meal_events.create(
+        {"group_id": UUID(unique_user.group_id), "household_id": household.id, "name": "Repas", "status": "DRAFT"}
+    )
+    scoped.pe_meal_event_guests.create(
+        {
+            "group_id": UUID(unique_user.group_id),
+            "household_id": household.id,
+            "event_id": event.id,
+            "person_id": person.id,
+        }
+    )
+
+    session.rollback()
+    group_repos.households.delete(household.id)
+
+    if ENFORCES_FOREIGN_KEYS:
+        session.expire_all()
+        everything = get_repositories(session, group_id=UUID(unique_user.group_id), household_id=None)
+        assert everything.pe_persons.get_one(person.id) is None
+        assert everything.pe_pantry_items.get_one(stock.id) is None
+        assert everything.pe_meal_events.get_one(event.id) is None
