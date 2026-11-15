@@ -10,6 +10,7 @@ from sqlalchemy import engine, orm, text
 
 from mealie.core import root_logger
 from mealie.core.config import get_app_settings
+from mealie.db import personal_migrations
 from mealie.db.db_setup import session_context
 from mealie.db.fixes.fix_group_with_no_name import fix_group_with_no_name
 from mealie.db.fixes.fix_migration_data import fix_migration_data
@@ -116,8 +117,10 @@ def main():
             logger.debug("Migration not needed.")
         else:
             logger.info("Migration needed. Performing migration...")
-            command.upgrade(alembic_cfg, "heads")
+            command.upgrade(alembic_cfg, "head")
             run_fixes = True
+
+        personal_migrations.upgrade()
 
         if session.get_bind().name == "postgresql":  # needed for fuzzy search and fast GIN text indices
             session.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))

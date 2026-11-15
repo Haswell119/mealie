@@ -14,7 +14,7 @@ from sqlalchemy import Connection, ForeignKey, ForeignKeyConstraint, MetaData, T
 from sqlalchemy.engine import base
 from sqlalchemy.orm import sessionmaker
 
-from mealie.db import init_db
+from mealie.db import init_db, personal_migrations
 from mealie.db.fixes.fix_migration_data import fix_migration_data
 from mealie.db.init_db import ALEMBIC_DIR
 from mealie.db.models._model_utils.guid import GUID
@@ -211,6 +211,7 @@ class AlchemyExporter(BaseService):
 
         alembic_cfg = Config(alembic_cfg_path)
         command.upgrade(alembic_cfg, alembic_version)
+        personal_migrations.upgrade_for_restore(db_dump)
 
         del db_dump["alembic_version"]
         """Restores all data from dictionary into the database"""
@@ -300,3 +301,6 @@ class AlchemyExporter(BaseService):
             else:
                 for table in tables:
                     connection.execute(DropTable(table))
+
+
+personal_migrations.register_backup_columns(AlchemyExporter)

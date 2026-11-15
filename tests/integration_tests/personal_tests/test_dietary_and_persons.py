@@ -240,3 +240,21 @@ def test_persons_are_not_visible_to_another_household_or_group(
 def test_persons_need_authentication(api_client: TestClient):
     assert api_client.get(f"{BASE}/persons").status_code == 401
     assert api_client.get(f"{BASE}/dietary/restrictions").status_code == 401
+
+
+def test_error_messages_follow_the_language_of_the_request(api_client: TestClient, unique_user: TestUser):
+    ids = restriction_ids(api_client, unique_user)
+    payload = {"displayName": "Alex", "restrictions": [{"restrictionId": ids["meat"]}]}
+
+    english = api_client.post(f"{BASE}/persons", json=payload, headers=unique_user.token)
+    assert english.json()["detail"]["message"].startswith("Record the consent")
+
+    headers = {**unique_user.token, "Accept-Language": "fr-FR"}
+    french = api_client.post(f"{BASE}/persons", json=payload, headers=headers)
+    assert french.status_code == 400
+    assert french.json()["detail"]["exception"] == "CONSENT_REQUIRED"
+    assert french.json()["detail"]["message"].startswith("Enregistrez le consentement")
+
+    missing = api_client.get(f"{BASE}/persons/{uuid4()}", headers=headers)
+    assert missing.status_code == 404
+    assert missing.json()["detail"]["message"] == "Personne introuvable."

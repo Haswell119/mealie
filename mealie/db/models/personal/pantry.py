@@ -9,7 +9,7 @@ from .._model_utils.auto_init import AutoInitOptions, auto_init
 from .._model_utils.datetime import NaiveDateTime
 from .._model_utils.guid import GUID
 from ..recipe.ingredient import IngredientFoodModel, IngredientUnitModel
-from ._common import PersonalGroupScoped, PersonalHouseholdScoped
+from ._common import JSONText, PersonalGroupScoped, PersonalHouseholdScoped
 
 
 class PeProduct(PersonalGroupScoped, SqlAlchemyBase, BaseMixins):
@@ -21,13 +21,13 @@ class PeProduct(PersonalGroupScoped, SqlAlchemyBase, BaseMixins):
     barcode: FilterableColumn[str] = mapped_column(sa.String, nullable=False, index=True)
     name: FilterableColumn[str] = mapped_column(sa.String, nullable=False, index=True)
     brand: FilterableColumn[str | None] = mapped_column(sa.String)
-    stores: FilterableColumn[list | None] = mapped_column(sa.JSON)
+    stores: FilterableColumn[list | None] = mapped_column(JSONText)
     quantity: FilterableColumn[float | None] = mapped_column(sa.Float)
     quantity_unit: FilterableColumn[str | None] = mapped_column(sa.String)
     quantity_text: FilterableColumn[str | None] = mapped_column(sa.String)
-    labels: FilterableColumn[list | None] = mapped_column(sa.JSON)
-    allergens: FilterableColumn[list | None] = mapped_column(sa.JSON)
-    traces: FilterableColumn[list | None] = mapped_column(sa.JSON)
+    labels: FilterableColumn[list | None] = mapped_column(JSONText)
+    allergens: FilterableColumn[list | None] = mapped_column(JSONText)
+    traces: FilterableColumn[list | None] = mapped_column(JSONText)
     image_url: FilterableColumn[str | None] = mapped_column(sa.String)
     source: FilterableColumn[str] = mapped_column(sa.String, nullable=False)
     source_url: FilterableColumn[str | None] = mapped_column(sa.String)

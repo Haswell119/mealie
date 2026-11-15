@@ -218,14 +218,13 @@ class AssistantTools:
         event = self.events.get_one(self._uuid(event_id))
         analysis = self.events.analyze(event.id)
 
-        guests = []
-        for person in analysis.constraints.individual:
-            guests.append(
-                {
-                    "guest": self.anonymizer.label(person.person_id),
-                    "constraints": [constraint.restriction_key for constraint in person.constraints],
-                }
-            )
+        guests = [
+            {
+                "guest": self.anonymizer.label(constrained.person_id),
+                "constraints": [constraint.restriction_key for constraint in constrained.constraints],
+            }
+            for constrained in analysis.constraints.individual
+        ]
 
         preferences = []
         for guest in event.guests:
@@ -257,8 +256,8 @@ class AssistantTools:
     def _event_keys(self, event_id: Any) -> set[str]:
         analysis = self.events.analyze(self._uuid(event_id))
         keys = {constraint.restriction_key for constraint in analysis.constraints.shared}
-        for person in analysis.constraints.individual:
-            keys |= {constraint.restriction_key for constraint in person.constraints}
+        for constrained in analysis.constraints.individual:
+            keys |= {constraint.restriction_key for constraint in constrained.constraints}
         return keys
 
     def _tool_check_dietary_constraints(

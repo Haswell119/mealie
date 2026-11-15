@@ -113,7 +113,7 @@ class ShoppingPlanService:
 
     def create(self, data: ShoppingPlanCreate) -> ShoppingPlanOut:
         self._check(data)
-        if data.source_type == ShoppingPlanSource.EVENT:
+        if data.source_type == ShoppingPlanSource.EVENT and data.event_id is not None:
             existing = self.plans.multi_query({"event_id": data.event_id}, limit=1)
             if existing:
                 return existing[0]
@@ -440,8 +440,8 @@ class ShoppingPlanService:
                 owned.add(item_id)
 
             elif result.action == ACTION_UPDATE and step.item is not None:
-                quantity = convert(result.item_quantity, step.unit, unit_info(step.item.unit))
-                self._update_item(step.item, quantity if quantity is not None else result.item_quantity, step.line)
+                converted = convert(result.item_quantity, step.unit, unit_info(step.item.unit))
+                self._update_item(step.item, converted if converted is not None else result.item_quantity, step.line)
                 out.updated += 1
 
             elif result.action == ACTION_DELETE and step.item is not None:

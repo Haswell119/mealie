@@ -323,12 +323,14 @@ class MealEventService:
             if analysis.blocking:
                 raise PersonalError(
                     "EVENT_HAS_BLOCKING_ISSUES",
-                    f"The menu has {len(analysis.blocking)} issue(s) that break a restriction. Fix them first.",
+                    "The menu has {count} issue(s) that break a restriction. Fix them first.",
+                    count=len(analysis.blocking),
                 )
             if analysis.to_verify and not data.acknowledge_unverified:
                 raise PersonalError(
                     "UNVERIFIED_NOT_ACKNOWLEDGED",
-                    f"{len(analysis.to_verify)} item(s) are not verified. Confirm that you saw them.",
+                    "{count} item(s) are not verified. Confirm that you saw them.",
+                    count=len(analysis.to_verify),
                 )
             detail = {"unverified": len(analysis.to_verify), "acknowledged": data.acknowledge_unverified}
             self._log(event_id, "PLANNED", detail)

@@ -8,7 +8,7 @@ from .._model_base import BaseMixins, FilterableColumn, SqlAlchemyBase
 from .._model_utils.auto_init import AutoInitOptions, auto_init
 from .._model_utils.datetime import NaiveDateTime
 from .._model_utils.guid import GUID
-from ._common import PersonalHouseholdScoped
+from ._common import JSONText, PersonalHouseholdScoped
 
 
 class PeShoppingPlanLine(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
@@ -44,8 +44,8 @@ class PeShoppingPlanLine(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     shopping_list_item_id: FilterableColumn[GUID | None] = mapped_column(GUID, index=True)
     state: FilterableColumn[str] = mapped_column(sa.String, nullable=False, default="ACTIVE")
 
-    sources: FilterableColumn[list | None] = mapped_column(sa.JSON)
-    checks: FilterableColumn[list | None] = mapped_column(sa.JSON)
+    sources: FilterableColumn[list | None] = mapped_column(JSONText)
+    checks: FilterableColumn[list | None] = mapped_column(JSONText)
 
     @auto_init()
     def __init__(self, **_) -> None:
@@ -62,7 +62,7 @@ class PeShoppingPlan(PersonalHouseholdScoped, SqlAlchemyBase, BaseMixins):
     event_id: FilterableColumn[GUID | None] = mapped_column(GUID, sa.ForeignKey("pe_meal_events.id"), index=True)
     date_from: FilterableColumn[date | None] = mapped_column(sa.Date)
     date_to: FilterableColumn[date | None] = mapped_column(sa.Date)
-    recipes: FilterableColumn[list | None] = mapped_column(sa.JSON)
+    recipes: FilterableColumn[list | None] = mapped_column(JSONText)
 
     shopping_list_id: FilterableColumn[GUID | None] = mapped_column(
         GUID, sa.ForeignKey("shopping_lists.id"), index=True

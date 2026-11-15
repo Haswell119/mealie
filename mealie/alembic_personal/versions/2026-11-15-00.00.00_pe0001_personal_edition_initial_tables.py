@@ -1,8 +1,8 @@
 """personal edition initial tables
 
-Revision ID: pe0001a1b2c3
+Revision ID: pe0001
 Revises:
-Create Date: 2026-11-15 11:31:50.446451
+Create Date: 2026-11-15 00:00:00
 
 """
 
@@ -12,10 +12,10 @@ from alembic import op
 import mealie.db.migration_types
 
 # revision identifiers, used by Alembic.
-revision = "pe0001a1b2c3"
+revision = "pe0001"
 down_revision: str | None = None
-branch_labels: str | tuple[str, ...] | None = ("personal",)
-depends_on: str | tuple[str, ...] | None = "f3a1ae61d772"
+branch_labels: str | tuple[str, ...] | None = None
+depends_on: str | tuple[str, ...] | None = None
 
 
 def upgrade():
@@ -50,9 +50,9 @@ def upgrade():
         sa.Column("url", sa.String(), nullable=True),
         sa.Column("text", sa.String(), nullable=True),
         sa.Column("image", sa.String(), nullable=True),
-        sa.Column("tags", sa.JSON(), nullable=True),
+        sa.Column("tags", sa.Text(), nullable=True),
         sa.Column("status", sa.String(), nullable=False),
-        sa.Column("draft", sa.JSON(), nullable=True),
+        sa.Column("draft", sa.Text(), nullable=True),
         sa.Column("recipe_id", mealie.db.migration_types.GUID(), nullable=True),
         sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
@@ -198,13 +198,13 @@ def upgrade():
         sa.Column("barcode", sa.String(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("brand", sa.String(), nullable=True),
-        sa.Column("stores", sa.JSON(), nullable=True),
+        sa.Column("stores", sa.Text(), nullable=True),
         sa.Column("quantity", sa.Float(), nullable=True),
         sa.Column("quantity_unit", sa.String(), nullable=True),
         sa.Column("quantity_text", sa.String(), nullable=True),
-        sa.Column("labels", sa.JSON(), nullable=True),
-        sa.Column("allergens", sa.JSON(), nullable=True),
-        sa.Column("traces", sa.JSON(), nullable=True),
+        sa.Column("labels", sa.Text(), nullable=True),
+        sa.Column("allergens", sa.Text(), nullable=True),
+        sa.Column("traces", sa.Text(), nullable=True),
         sa.Column("image_url", sa.String(), nullable=True),
         sa.Column("source", sa.String(), nullable=False),
         sa.Column("source_url", sa.String(), nullable=True),
@@ -440,11 +440,11 @@ def upgrade():
         sa.Column("kind", sa.String(), nullable=False),
         sa.Column("status", sa.String(), nullable=False),
         sa.Column("title", sa.String(), nullable=False),
-        sa.Column("payload", sa.JSON(), nullable=True),
+        sa.Column("payload", sa.Text(), nullable=True),
         sa.Column("event_id", mealie.db.migration_types.GUID(), nullable=True),
         sa.Column("created_by", mealie.db.migration_types.GUID(), nullable=True),
         sa.Column("decided_at", mealie.db.migration_types.NaiveDateTime(), nullable=True),
-        sa.Column("result", sa.JSON(), nullable=True),
+        sa.Column("result", sa.Text(), nullable=True),
         sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),
@@ -587,7 +587,7 @@ def upgrade():
         sa.Column("event_id", mealie.db.migration_types.GUID(), nullable=True),
         sa.Column("date_from", sa.Date(), nullable=True),
         sa.Column("date_to", sa.Date(), nullable=True),
-        sa.Column("recipes", sa.JSON(), nullable=True),
+        sa.Column("recipes", sa.Text(), nullable=True),
         sa.Column("shopping_list_id", mealie.db.migration_types.GUID(), nullable=True),
         sa.Column("status", sa.String(), nullable=False),
         sa.Column("use_stock", sa.Boolean(), nullable=False),
@@ -738,8 +738,8 @@ def upgrade():
         sa.Column("purchased_quantity", sa.Float(), nullable=False),
         sa.Column("shopping_list_item_id", mealie.db.migration_types.GUID(), nullable=True),
         sa.Column("state", sa.String(), nullable=False),
-        sa.Column("sources", sa.JSON(), nullable=True),
-        sa.Column("checks", sa.JSON(), nullable=True),
+        sa.Column("sources", sa.Text(), nullable=True),
+        sa.Column("checks", sa.Text(), nullable=True),
         sa.Column("household_id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("id", mealie.db.migration_types.GUID(), nullable=False),
         sa.Column("group_id", mealie.db.migration_types.GUID(), nullable=False),

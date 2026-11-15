@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from . import (
     controller_assistant,
@@ -10,8 +10,9 @@ from . import (
     controller_products,
     controller_shopping_plans,
 )
+from ._base import remember_locale
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(remember_locale)])
 
 router.include_router(controller_dietary.router)
 router.include_router(controller_persons.router)

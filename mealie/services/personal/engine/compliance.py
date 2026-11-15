@@ -1,6 +1,7 @@
 """Check recipes against dietary restrictions. Deterministic: no database, no network, no AI."""
 
 from dataclasses import dataclass, field
+from typing import Any
 from uuid import UUID
 
 from mealie.schema.personal.enums import FindingCode, VerificationSource, VerificationStatus
@@ -88,7 +89,7 @@ def evaluate_ingredient(ingredient: IngredientView, restriction_key: str, book: 
 
     An ingredient without stored state is never verified: at best it is unverified without a known issue.
     """
-    common = {
+    common: dict[str, Any] = {
         "restriction_key": restriction_key,
         "subject": ingredient.display,
         "food_id": ingredient.food_id,

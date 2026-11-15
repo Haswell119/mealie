@@ -73,7 +73,7 @@ class DietaryService:
     def create_restriction(self, data: DietaryRestrictionCreate) -> DietaryRestrictionOut:
         self.ensure_defaults()
         if self.restrictions_repo.get_one(data.key, "key") is not None:
-            raise PersonalError("RESTRICTION_EXISTS", f"A restriction with the key '{data.key}' already exists.")
+            raise PersonalError("RESTRICTION_EXISTS", "A restriction with this key already exists.")
         return self.restrictions_repo.create(data.cast(DietaryRestrictionSave, group_id=self.group_id))
 
     def update_restriction(self, restriction_id: UUID4, data: DietaryRestrictionCreate) -> DietaryRestrictionOut:
