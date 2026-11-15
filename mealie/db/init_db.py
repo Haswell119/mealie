@@ -116,7 +116,7 @@ def main():
             logger.debug("Migration not needed.")
         else:
             logger.info("Migration needed. Performing migration...")
-            command.upgrade(alembic_cfg, "head")
+            command.upgrade(alembic_cfg, "heads")
             run_fixes = True
 
         if session.get_bind().name == "postgresql":  # needed for fuzzy search and fast GIN text indices

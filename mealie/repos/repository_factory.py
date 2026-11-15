@@ -75,6 +75,7 @@ from mealie.schema.user.user import UserRatingOut
 from mealie.schema.user.user_passwords import PrivatePasswordResetToken
 
 from ._utils import NOT_SET, NotSet
+from .personal import PersonalRepositories
 from .repository_generic import GroupRepositoryGeneric, HouseholdRepositoryGeneric
 from .repository_group import RepositoryGroup
 from .repository_meals import RepositoryMeals
@@ -251,7 +252,7 @@ class RepositoryMultiPurposeLabels(GroupRepositoryGeneric[MultiPurposeLabelOut, 
         return self.get_one(to_label)
 
 
-class AllRepositories:
+class AllRepositories(PersonalRepositories):
     """
     `AllRepositories` class is the data access layer for all database actions within
     Mealie. Database uses composition from classes derived from AccessModel. These
