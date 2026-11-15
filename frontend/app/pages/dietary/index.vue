@@ -99,6 +99,66 @@
     </BaseDialog>
 
     <h3 class="text-h6 mt-6 mb-2">
+      {{ $t('personal.dietary.restrictions-title') }}
+    </h3>
+    <div class="d-flex flex-wrap ga-2 mb-3">
+      <v-chip
+        v-for="restriction in restrictions"
+        :key="restriction.id"
+        size="small"
+        :closable="!restriction.isSystem"
+        :variant="restriction.isSystem ? 'tonal' : 'outlined'"
+        data-testid="dietary-restriction"
+        @click:close="deleteRestriction(restriction.id)"
+      >
+        {{ restriction.name }} · {{ $t(`personal.enums.kind.${restriction.kind}`) }}
+      </v-chip>
+    </div>
+    <v-row
+      dense
+      align="center"
+    >
+      <v-col
+        cols="12"
+        sm="6"
+      >
+        <v-text-field
+          v-model="restrictionForm.name"
+          :label="$t('personal.dietary.new-restriction')"
+          density="compact"
+          hide-details
+          data-testid="dietary-restriction-name"
+        />
+      </v-col>
+      <v-col
+        cols="8"
+        sm="4"
+      >
+        <v-select
+          v-model="restrictionForm.kind"
+          :items="kindItems"
+          :label="$t('personal.dietary.restriction-kind')"
+          density="compact"
+          hide-details
+        />
+      </v-col>
+      <v-col
+        cols="4"
+        sm="2"
+      >
+        <v-btn
+          block
+          color="primary"
+          :disabled="!restrictionForm.name.trim()"
+          data-testid="dietary-restriction-add"
+          @click="createRestriction"
+        >
+          {{ $t('personal.common.add') }}
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <h3 class="text-h6 mt-6 mb-2">
       {{ $t('personal.dietary.tools-title') }}
     </h3>
     <p class="text-body-2 text-medium-emphasis">
@@ -198,6 +258,7 @@ import type {
   DietaryRestrictionOut,
   FoodComplianceOut,
   FoodRestrictionEffective,
+  RestrictionKind,
   ToolRestrictionStatusOut,
   VerificationStatus,
 } from "~/lib/api/types/personal";
@@ -228,6 +289,38 @@ const toolForm = ref<{ toolId: string | null; restrictionId: string | null; reas
   restrictionId: null,
   reason: "",
 });
+
+const restrictionForm = ref<{ name: string; kind: RestrictionKind }>({ name: "", kind: "PREFERENCE" });
+const kindItems = computed(() =>
+  (["MEDICAL", "ALLERGY", "INTOLERANCE", "ETHICAL", "PREFERENCE"] as RestrictionKind[]).map(value => ({
+    value,
+    title: i18n.t(`personal.enums.kind.${value}`),
+  })),
+);
+
+async function loadRestrictions() {
+  const { data } = await api.dietary.getRestrictions();
+  restrictions.value = data ?? [];
+}
+
+async function createRestriction() {
+  const name = restrictionForm.value.name.trim();
+  // The key is a stable identifier without accents or spaces, built from the name.
+  const key = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  if (!key) {
+    return;
+  }
+  const { data } = await api.dietary.createRestriction({ key, name, kind: restrictionForm.value.kind });
+  if (data) {
+    restrictionForm.value = { name: "", kind: "PREFERENCE" };
+    await Promise.all([loadRestrictions(), loadFood()]);
+  }
+}
+
+async function deleteRestriction(id: string) {
+  await api.dietary.deleteRestriction(id);
+  await Promise.all([loadRestrictions(), loadFood()]);
+}
 
 async function loadFood() {
   if (!foodId.value) {
@@ -293,8 +386,7 @@ async function unflagTool(id: string) {
 }
 
 onMounted(async () => {
-  const { data } = await api.dietary.getRestrictions();
-  restrictions.value = data ?? [];
+  await loadRestrictions();
   await Promise.all([loadFood(), loadTools()]);
 });
 </script>
